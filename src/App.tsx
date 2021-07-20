@@ -1,55 +1,44 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import enTranslations from "@shopify/polaris/locales/en.json";
-import {
-  AppProvider,
-  Page,
-  Card,
-  ResourceList,
-  TextStyle,
-  Avatar,
-} from "@shopify/polaris";
+import { AppProvider, Frame } from "@shopify/polaris";
 
-function render() {
+const App = () => {
   ReactDOM.render(
-    <AppProvider i18n={enTranslations}>
-      <Page>
-        <Card>
-          <ResourceList
-            showHeader
-            items={[
-              {
-                id: 341,
-                url: "customers/341",
-                name: "Mae Jemison",
-                location: "Decatur, USA",
-              },
-              {
-                id: 256,
-                url: "customers/256",
-                name: "Ellen Ochoa",
-                location: "Los Angeles, USA",
-              },
-            ]}
-            renderItem={(item) => {
-              const { id, url, name, location } = item;
-              const media = <Avatar customer size="medium" name={name} />;
-
-              return (
-                <ResourceList.Item id={id.toString()} url={url} media={media}>
-                  <h3>
-                    <TextStyle variation="strong">{name}</TextStyle>
-                  </h3>
-                  <div>{location}</div>
-                </ResourceList.Item>
-              );
-            }}
-          />
-        </Card>
-      </Page>
-    </AppProvider>,
-    document.body
+    <div style={styles.app as React.CSSProperties}>
+      <AppProvider i18n={enTranslations}>
+        <Frame>
+          <div style={styles.box as React.CSSProperties}>
+            <div style={styles.left as React.CSSProperties}>hi</div>
+            <div style={styles.right as React.CSSProperties}>hello</div>
+          </div>
+        </Frame>
+      </AppProvider>
+    </div>,
+    document.querySelector("#app")
   );
-}
+};
 
-render();
+const styles = {
+  app: {
+    flex: 1,
+    width: "100vw",
+    height: "100vh",
+    flexDirection: "row",
+  },
+  box: {
+    display: "flex",
+    flexDirection: "row",
+    height: "100%",
+  },
+  left: {
+    flex: 1,
+    backgroundColor: "red",
+  },
+  right: {
+    flex: 2,
+    backgroundColor: "blue",
+  },
+};
+
+App();
