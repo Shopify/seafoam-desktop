@@ -23,7 +23,7 @@ jobs:
         run: yarn --frozen-lockfile
 
       - name: 🚔 Run ESLint
-        run: yarn eslint --ext .ts .
+        run: yarn eslint
 
       - name: 💅🏼 Run Prettier
-        run: yarn prettier -c .
+        run: yarn prettier
