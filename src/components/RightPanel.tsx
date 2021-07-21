@@ -3,7 +3,7 @@ import * as React from "react";
 import { Page, TopBar, Card, Select } from "@shopify/polaris";
 import { Graphviz } from "graphviz-react";
 import { GraphvizOptions } from "d3-graphviz";
-import RootFolder from "../RootFolder";
+import RootFolder from "../types/RootFolder";
 
 const RightPanel: React.FunctionComponent = () => {
   const [searchValue, setSearchValue] = React.useState("");
