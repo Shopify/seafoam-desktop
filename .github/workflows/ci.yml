@@ -22,8 +22,8 @@ jobs:
       - name: 📦 Install dependencies
         run: yarn --frozen-lockfile
 
-      - name: 🚔 Run ESLint
-        run: yarn eslint
+      - name: 🚔 Run Lint
+        run: yarn lint
 
       - name: 💅🏼 Run Prettier
         run: yarn prettier
