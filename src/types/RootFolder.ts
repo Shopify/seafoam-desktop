@@ -4,7 +4,7 @@ export default class RootFolder {
     content: string;
     methods: { name: string; seafoamNodes: SeafoamNode[] }[];
   }[];
-  constructor(filepath: string) {
+  constructor(_filepath: string) {
     this.dumps = [
       {
         id: "dump-folder-1",
@@ -80,7 +80,7 @@ export class SeafoamNode {
     this.name = name;
   }
 
-  dot() {
+  dot(): string {
     return `
       digraph G {
         graph [bgcolor="white"];

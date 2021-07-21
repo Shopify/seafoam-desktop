@@ -21,5 +21,22 @@
       }
     }
   },
-  "ignorePatterns": ["webpack*"]
+  "ignorePatterns": ["webpack*"],
+  "rules": {
+    "@typescript-eslint/no-unused-vars": [
+      "warn",
+      { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }
+    ]
+  },
+  "overrides": [
+    // TSX files only return React components. For any other TypeScript work that doesn't rely on JSX,
+    // we use the .ts extension. Since we always know that the exported functions are for React components,
+    // we don't need the explicit return type annotation. It's mostly just noise.
+    {
+      "files": ["src/**/*.tsx"],
+      "rules": {
+        "@typescript-eslint/explicit-module-boundary-types": "off"
+      }
+    }
+  ]
 }
