@@ -1,9 +1,10 @@
-class RootFolder {
-  dumps: { name: string; methods: { name: string; nodes: SeafoamNode[] }[] }[];
+export default class RootFolder {
+  dumps: { id: string, content: string; methods: { name: string; nodes: SeafoamNode[] }[] }[];
   constructor(filepath: string) {
     this.dumps = [
       {
-        name: "2021.07.20.13.16.44.111",
+        id: "dump-folder-1",
+        content: "2021.07.20.13.16.44.111",
         methods: [
           {
             name: "TruffleHotSpotCompilation-17080[String#include?].bgv",
@@ -36,7 +37,8 @@ class RootFolder {
         ],
       },
       {
-        name: "2021.07.20.13.16.44.999",
+        id: "dump-folder-2",
+        content: "2021.07.20.13.16.44.999",
         methods: [
           {
             name: "TruffleHotSpotCompilation-11279[Array#size].bgv",
