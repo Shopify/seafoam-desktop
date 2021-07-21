@@ -73,6 +73,7 @@
     "@electron-forge/maker-squirrel": "^6.0.0-beta.58",
     "@electron-forge/maker-zip": "^6.0.0-beta.58",
     "@electron-forge/plugin-webpack": "6.0.0-beta.58",
+    "@types/d3-graphviz": "^2.6.7",
     "@types/react": "^17.0.14",
     "@types/react-dom": "^17.0.9",
     "@typescript-eslint/eslint-plugin": "^4.0.1",
@@ -93,6 +94,7 @@
   },
   "dependencies": {
     "@shopify/polaris": "^6.6.0",
+    "d3-graphviz": "^4.0.0",
     "electron-squirrel-startup": "^1.0.0",
     "graphviz-react": "^1.2.0",
     "react": "^17.0.2",
