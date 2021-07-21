@@ -1,13 +1,18 @@
-class RootFolder {
-  dumps: { name: string; methods: { name: string; nodes: SeafoamNode[] }[] }[];
+export default class RootFolder {
+  dumps: {
+    id: string;
+    content: string;
+    methods: { name: string; seafoamNodes: SeafoamNode[] }[];
+  }[];
   constructor(filepath: string) {
     this.dumps = [
       {
-        name: "2021.07.20.13.16.44.111",
+        id: "dump-folder-1",
+        content: "2021.07.20.13.16.44.111",
         methods: [
           {
             name: "TruffleHotSpotCompilation-17080[String#include?].bgv",
-            nodes: [
+            seafoamNodes: [
               new SeafoamNode(
                 "TruffleIR::String#include?()/Call Tree/Before Inline"
               ),
@@ -21,7 +26,7 @@ class RootFolder {
           },
           {
             name: "TruffleHotSpotCompilation-17080[String#include?]_1.bgv",
-            nodes: [
+            seafoamNodes: [
               new SeafoamNode(
                 "TruffleIR::String#include?()/Call Tree/Before Inline"
               ),
@@ -36,11 +41,12 @@ class RootFolder {
         ],
       },
       {
-        name: "2021.07.20.13.16.44.999",
+        id: "dump-folder-2",
+        content: "2021.07.20.13.16.44.999",
         methods: [
           {
             name: "TruffleHotSpotCompilation-11279[Array#size].bgv",
-            nodes: [
+            seafoamNodes: [
               new SeafoamNode(
                 "TruffleIR::Array#size()/Call Tree/Before Inline"
               ),
@@ -52,7 +58,7 @@ class RootFolder {
           },
           {
             name: "TruffleHotSpotCompilation-11279[Array#size]_1.bgv",
-            nodes: [
+            seafoamNodes: [
               new SeafoamNode(
                 "TruffleIR::Array#size()/Call Tree/Before Inline"
               ),
@@ -68,7 +74,7 @@ class RootFolder {
   }
 }
 
-class SeafoamNode {
+export class SeafoamNode {
   name: string;
   constructor(name: string) {
     this.name = name;
