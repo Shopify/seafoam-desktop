@@ -1,16 +1,11 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import enTranslations from "@shopify/polaris/locales/en.json";
-import { AppProvider, Page, TopBar } from "@shopify/polaris";
+import { AppProvider } from "@shopify/polaris";
+import LeftPanel from "./components/LeftPanel";
+import RightPanel from "./components/RightPanel";
 
 const App = () => {
-  const [searchValue, setSearchValue] = React.useState("");
-
-  const onSearchValueChange = React.useCallback(
-    (value) => setSearchValue(value),
-    []
-  );
-
   // The App is tentatively split into two "sections". This is achieved by using two full-height divs, and using CSS flex
   // to create a 2:1 ratio between the right and left panel.
 
@@ -19,15 +14,10 @@ const App = () => {
       <AppProvider i18n={enTranslations}>
         <div style={styles.box as React.CSSProperties}>
           <div style={styles.left as React.CSSProperties}>
-            <Page title="Dump Panel"></Page>
+            <LeftPanel />
           </div>
           <div style={styles.right as React.CSSProperties}>
-            <Page title="Graph Panel">
-              <TopBar.SearchField
-                value={searchValue}
-                onChange={onSearchValueChange}
-              />
-            </Page>
+            <RightPanel />
           </div>
         </div>
       </AppProvider>
