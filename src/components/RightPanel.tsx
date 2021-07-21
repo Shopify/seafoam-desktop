@@ -3,8 +3,7 @@ import * as React from "react";
 import { Page, TopBar, Card, Select } from "@shopify/polaris";
 import { Graphviz } from "graphviz-react";
 import { GraphvizOptions } from "d3-graphviz";
-
-import dot from "../data/sample_encoding_name.js";
+import RootFolder from "../RootFolder";
 
 const RightPanel: React.FunctionComponent = () => {
   const [searchValue, setSearchValue] = React.useState("");
@@ -16,6 +15,9 @@ const RightPanel: React.FunctionComponent = () => {
     { label: "Phase 2", value: "2" },
     { label: "Phase 3", value: "3" },
   ];
+
+  const mockRootFolder = new RootFolder("mock/filepath/src/dumps");
+  const dot = mockRootFolder.dumps[0].methods[0].nodes[0].dot();
 
   const handleSearchValueChange = React.useCallback(
     (value) => setSearchValue(value),
