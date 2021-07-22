@@ -1,102 +1,53 @@
 import * as React from "react";
 
-import { Page, TopBar, Card, Select } from "@shopify/polaris";
+import { Page, Card } from "@shopify/polaris";
 import { Graphviz } from "graphviz-react";
 import { GraphvizOptions } from "d3-graphviz";
 import RootFolder from "../types/RootFolder";
+import GraphTopBar from "./GraphTopBar";
+import EmptyGraphPlaceholder from "./EmptyGraphPlaceholder";
 
 const EMPTY_GRAPH = "digraph {}";
 
 const RightPanel: React.FunctionComponent = () => {
-  const [searchValue, setSearchValue] = React.useState("");
-  const [selectedPhase, setSelectedPhase] = React.useState("Phase 1");
-
-  // Fake data
-  const options = [
-    { label: "Phase 1", value: "1" },
-    { label: "Phase 2", value: "2" },
-    { label: "Phase 3", value: "3" },
-  ];
-
   const mockRootFolder = new RootFolder("mock/filepath/src/dumps", []);
-  const dot =
-    mockRootFolder?.dumps[0]?.methods[0]?.seafoamNodes[0]?.dot() || EMPTY_GRAPH;
-
-  const handleSearchValueChange = React.useCallback(
-    (value) => setSearchValue(value),
-    []
-  );
-
-  const handleSelectPhaseChange = React.useCallback(
-    (value) => setSelectedPhase(value),
-    []
-  );
-
-  const graphOptions: GraphvizOptions = {
-    width: null,
-    height: 1000,
-    fit: true,
-  };
+  const selectedPhase = mockRootFolder?.dumps[0]?.methods[0]?.seafoamNodes[0];
+  const dot = selectedPhase?.dot() || EMPTY_GRAPH;
+  const dotGraph = <Graphviz dot={dot} options={graphOptions} />;
+  const emptyState = <EmptyGraphPlaceholder />;
+  const doesGraphExist: boolean = dot == EMPTY_GRAPH ? false : true;
 
   return (
     <Page title="Graph Panel">
       <div style={column}>
-        <div style={row}>
-          <div style={picker}>
-            <Select
-              label="Phase"
-              onChange={handleSelectPhaseChange}
-              value={selectedPhase}
-              options={options}
-            />
-          </div>
-          <div style={search}>
-            <TopBar.SearchField
-              value={searchValue}
-              onChange={handleSearchValueChange}
-            />
-          </div>
-        </div>
-        <Card>
-          <div style={box}>
-            <Graphviz dot={dot} options={graphOptions} />
-          </div>
+        <GraphTopBar />
+        <br />
+        <Card sectioned>
+          <div style={box}>{doesGraphExist ? dotGraph : emptyState}</div>
         </Card>
       </div>
     </Page>
   );
 };
 
-const box = {
-  flex: 1,
+const graphOptions: GraphvizOptions = {
+  width: null,
+  height: 1000,
+  fit: true,
 };
 
-const row: React.CSSProperties = {
+const box = {
   flex: 1,
-  display: "flex",
-  flexDirection: "row",
-  width: "100%",
-  alignItems: "flex-end",
-  justifyContent: "space-around",
 };
 
 const column: React.CSSProperties = {
   display: "flex",
   height: "100%",
-  alignItems: "center",
+  alignItems: "right",
   justifyContent: "center",
   flexDirection: "column",
   padding: 16,
   alignContent: "space-between",
-};
-
-const picker = {
-  flex: 1,
-  padding: 16,
-};
-const search = {
-  flex: 2,
-  padding: 16,
 };
 
 export default RightPanel;
