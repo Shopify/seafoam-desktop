@@ -1,6 +1,6 @@
 {
   "name": "seafoam-gui",
-  "productName": "seafoam-gui",
+  "productName": "Seafoam",
   "version": "1.0.0",
   "description": "My Electron application description",
   "main": ".webpack/main",
@@ -28,7 +28,7 @@
         {
           "name": "@electron-forge/maker-squirrel",
           "config": {
-            "name": "seafoam_gui"
+            "name": "seafoam-gui"
           }
         },
         {
@@ -57,7 +57,10 @@
                 {
                   "html": "./src/index.html",
                   "js": "./src/renderer.ts",
-                  "name": "main_window"
+                  "name": "main_window",
+                  "preload": {
+                    "js": "./src/electron/preload.ts"
+                  }
                 }
               ]
             }

@@ -4,73 +4,33 @@ export default class RootFolder {
     content: string;
     methods: { name: string; seafoamNodes: SeafoamNode[] }[];
   }[];
-  constructor(_filepath: string) {
+  constructor(filepath: string, files: string[]) {
     this.dumps = [
       {
         id: "dump-folder-1",
-        content: "2021.07.20.13.16.44.111",
-        methods: [
-          {
-            name: "TruffleHotSpotCompilation-17080[String#include?].bgv",
-            seafoamNodes: [
-              new SeafoamNode(
-                "TruffleIR::String#include?()/Call Tree/Before Inline"
-              ),
-              new SeafoamNode(
-                "TruffleIR::String#include?()/Call Tree/After Inline"
-              ),
-              new SeafoamNode(
-                "TruffleIR::String#include?()/After phase org.graalvm.compiler.truffle.compiler.phases.inlining.AgnosticInliningPhase"
-              ),
-            ],
-          },
-          {
-            name: "TruffleHotSpotCompilation-17080[String#include?]_1.bgv",
-            seafoamNodes: [
-              new SeafoamNode(
-                "TruffleIR::String#include?()/Call Tree/Before Inline"
-              ),
-              new SeafoamNode(
-                "TruffleIR::String#include?()/Call Tree/After Inline"
-              ),
-              new SeafoamNode(
-                "TruffleIR::String#include?()/After phase org.graalvm.compiler.truffle.compiler.phases.inlining.AgnosticInliningPhase"
-              ),
-            ],
-          },
-        ],
-      },
-      {
-        id: "dump-folder-2",
-        content: "2021.07.20.13.16.44.999",
-        methods: [
-          {
-            name: "TruffleHotSpotCompilation-11279[Array#size].bgv",
-            seafoamNodes: [
-              new SeafoamNode(
-                "TruffleIR::Array#size()/Call Tree/Before Inline"
-              ),
-              new SeafoamNode("TruffleIR::Array#size()/Call Tree/After Inline"),
-              new SeafoamNode(
-                "TruffleIR::Array#size()/After phase org.graalvm.compiler.truffle.compiler.phases.inlining.AgnosticInliningPhase"
-              ),
-            ],
-          },
-          {
-            name: "TruffleHotSpotCompilation-11279[Array#size]_1.bgv",
-            seafoamNodes: [
-              new SeafoamNode(
-                "TruffleIR::Array#size()/Call Tree/Before Inline"
-              ),
-              new SeafoamNode("TruffleIR::Array#size()/Call Tree/After Inline"),
-              new SeafoamNode(
-                "TruffleIR::Array#size()/After phase org.graalvm.compiler.truffle.compiler.phases.inlining.AgnosticInliningPhase"
-              ),
-            ],
-          },
-        ],
+        content: filepath.split("/").pop(),
+        methods: files.map((file) => {
+          return {
+            name: this.#extractMethodName(file.split("/").pop()),
+            seafoamNodes: [],
+          };
+        }),
       },
     ];
+  }
+
+  #extractMethodName(filename: string): string {
+    const match = filename.match(/\[(.+)\]/)[1];
+    let newName = match || filename;
+
+    // This is a rough heuristic that seems to hold up, at least with regards
+    // to files from Graal. However, the real information is embedded in the
+    // file and we do not have it at this point.
+    if (filename.endsWith("_1.bgv")) {
+      newName += " (AST)";
+    }
+
+    return newName;
   }
 }
 
