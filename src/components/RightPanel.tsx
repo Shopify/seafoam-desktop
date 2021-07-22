@@ -5,6 +5,8 @@ import { Graphviz } from "graphviz-react";
 import { GraphvizOptions } from "d3-graphviz";
 import RootFolder from "../types/RootFolder";
 
+const EMPTY_GRAPH = "digraph {}";
+
 const RightPanel: React.FunctionComponent = () => {
   const [searchValue, setSearchValue] = React.useState("");
   const [selectedPhase, setSelectedPhase] = React.useState("Phase 1");
@@ -16,8 +18,9 @@ const RightPanel: React.FunctionComponent = () => {
     { label: "Phase 3", value: "3" },
   ];
 
-  const mockRootFolder = new RootFolder("mock/filepath/src/dumps");
-  const dot = mockRootFolder.dumps[0].methods[0].seafoamNodes[0].dot();
+  const mockRootFolder = new RootFolder("mock/filepath/src/dumps", []);
+  const dot =
+    mockRootFolder?.dumps[0]?.methods[0]?.seafoamNodes[0]?.dot() || EMPTY_GRAPH;
 
   const handleSearchValueChange = React.useCallback(
     (value) => setSearchValue(value),
