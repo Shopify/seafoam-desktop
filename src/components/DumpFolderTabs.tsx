@@ -2,11 +2,16 @@ import * as React from "react";
 import { useCallback, useEffect, useState } from "react";
 
 import { Card, Tabs } from "@shopify/polaris";
-import RootFolder from "../types/RootFolder";
+import RootFolder, { SeafoamNode } from "../types/RootFolder";
 import BgvFileList from "./BgvFileList";
 import { DirectoryLoadedPayload, IPCEvents } from "../events";
 
-export default function DumpFolderTabs() {
+interface Props {
+  methodFilter: string;
+}
+
+export default function DumpFolderTabs(props: Props) {
+  const methodFilter: string = props.methodFilter;
   const [selected, setSelected] = useState(0);
   const [rootFolder, setRootFolder] = useState<RootFolder>(
     new RootFolder("empty", [])
@@ -31,13 +36,25 @@ export default function DumpFolderTabs() {
   );
 
   const tabs = rootFolder.dumps;
-  const listOfBgvFiles = tabs[selected].methods;
+  const unfilteredList = tabs[selected].methods;
+
+  function finalListOfBgvFiles() {
+    const filteredList = unfilteredList.filter((query) =>
+      query.name.includes(methodFilter)
+    );
+    const filteredListWithNoResults =
+      filteredList.length == 0
+        ? [{ name: "No results found.", seafoamNodes: [new SeafoamNode("")] }]
+        : filteredList;
+
+    return methodFilter == "" ? unfilteredList : filteredListWithNoResults;
+  }
 
   return (
     <Card>
       <Tabs tabs={tabs} selected={selected} onSelect={handleTabChange}>
         <Card.Section title={tabs[selected].content}>
-          <BgvFileList listOfBgvFiles={listOfBgvFiles} />
+          <BgvFileList listOfBgvFiles={finalListOfBgvFiles()} />
         </Card.Section>
       </Tabs>
     </Card>

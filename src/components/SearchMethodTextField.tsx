@@ -1,13 +1,21 @@
 import { Button, TextField } from "@shopify/polaris";
-import React, { useCallback, useState } from "react";
+import React, { useState } from "react";
 
-export default function SearchMethodTextField() {
+interface Props {
+  methodFilter: (query: string) => void;
+}
+
+export default function SearchMethodTextField(props: Props) {
   const [textFieldValue, setTextFieldValue] = useState("");
-
-  const handleTextFieldChange = useCallback(
+  const handleTextFieldChange = React.useCallback(
     (value) => setTextFieldValue(value),
     []
   );
+
+  function handleMethodSearch() {
+    props.methodFilter(textFieldValue);
+    console.log(textFieldValue);
+  }
 
   return (
     <div>
@@ -18,7 +26,7 @@ export default function SearchMethodTextField() {
         placeholder="Example: String#[]"
       />
       <br />
-      <Button>Search</Button>
+      <Button onClick={handleMethodSearch}>Search</Button>
     </div>
   );
 }
