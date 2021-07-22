@@ -1,4 +1,4 @@
-import { TextField } from "@shopify/polaris";
+import { Button, TextField } from "@shopify/polaris";
 import React, { useCallback, useState } from "react";
 
 export default function SearchMethodTextField() {
@@ -10,11 +10,15 @@ export default function SearchMethodTextField() {
   );
 
   return (
-    <TextField
-      label="Search Methods"
-      value={textFieldValue}
-      onChange={handleTextFieldChange}
-      placeholder="Example: String#[]"
-    />
+    <div>
+      <TextField
+        label="Search Methods"
+        value={textFieldValue}
+        onChange={handleTextFieldChange}
+        placeholder="Example: String#[]"
+      />
+      <br />
+      <Button>Search</Button>
+    </div>
   );
 }
