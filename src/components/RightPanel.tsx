@@ -17,7 +17,7 @@ const RightPanel: React.FunctionComponent = () => {
   ];
 
   const mockRootFolder = new RootFolder("mock/filepath/src/dumps");
-  const dot = mockRootFolder.dumps[0].methods[0].nodes[0].dot();
+  const dot = mockRootFolder.dumps[0].methods[0].seafoamNodes[0].dot();
 
   const handleSearchValueChange = React.useCallback(
     (value) => setSearchValue(value),
