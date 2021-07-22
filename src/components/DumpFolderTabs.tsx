@@ -2,7 +2,7 @@ import * as React from "react";
 import { useCallback, useEffect, useState } from "react";
 
 import { Card, Tabs } from "@shopify/polaris";
-import RootFolder, { SeafoamNode } from "../types/RootFolder";
+import RootFolder, { SeafoamMethod, SeafoamNode } from "../types/RootFolder";
 import BgvFileList from "./BgvFileList";
 import { DirectoryLoadedPayload, IPCEvents } from "../events";
 
@@ -13,6 +13,8 @@ interface Props {
 export default function DumpFolderTabs(props: Props) {
   const methodFilter: string = props.methodFilter;
   const [selected, setSelected] = useState(0);
+  const [_selectedSeafoamMethod, setSelectedSeafoamMethod] =
+    useState<SeafoamMethod | null>(null);
   const [rootFolder, setRootFolder] = useState<RootFolder>(
     new RootFolder("empty", [])
   );
@@ -38,13 +40,21 @@ export default function DumpFolderTabs(props: Props) {
   const tabs = rootFolder.dumps;
   const unfilteredList = tabs[selected].methods;
 
-  function finalListOfBgvFiles() {
+  function finalListOfBgvFiles(): SeafoamMethod[] {
     const filteredList = unfilteredList.filter((query) =>
       query.name.includes(methodFilter)
     );
     const filteredListWithNoResults =
       filteredList.length == 0
-        ? [{ name: "No results found.", seafoamNodes: [new SeafoamNode("")] }]
+        ? [
+            {
+              name: "No results found.",
+              directory: "",
+              filename: "",
+              id: "",
+              seafoamNodes: [new SeafoamNode("")],
+            },
+          ]
         : filteredList;
 
     return methodFilter == "" ? unfilteredList : filteredListWithNoResults;
@@ -54,7 +64,18 @@ export default function DumpFolderTabs(props: Props) {
     <Card>
       <Tabs tabs={tabs} selected={selected} onSelect={handleTabChange}>
         <Card.Section title={tabs[selected].content}>
-          <BgvFileList listOfBgvFiles={finalListOfBgvFiles()} />
+          <BgvFileList
+            listOfBgvFiles={finalListOfBgvFiles()}
+            setSelectedFile={(method) => {
+              // TODO (kmenard 22-Jul-21): The phase value should come from the phase chooser widget.
+              window.ipc_events.send(IPCEvents.LoadDotData, {
+                filename: `${method.directory}/${method.filename}`,
+                phase: method.name.endsWith("(AST)") ? 0 : 1,
+              });
+
+              setSelectedSeafoamMethod(method);
+            }}
+          />
         </Card.Section>
       </Tabs>
     </Card>
