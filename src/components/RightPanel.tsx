@@ -33,6 +33,12 @@ const RightPanel: React.FunctionComponent = () => {
   );
 };
 
+const graphOptions: GraphvizOptions = {
+  width: null,
+  height: 1000,
+  fit: true,
+};
+
 const box = {
   flex: 1,
 };
