@@ -6,6 +6,8 @@ import { applicationMenu } from "./application-menu";
 // whether you're running in development or production).
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 
+declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
+
 app.setName("Seafoam");
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -19,6 +21,9 @@ const createWindow = (): void => {
   const mainWindow = new BrowserWindow({
     height: 600,
     width: 800,
+    webPreferences: {
+      preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
+    },
   });
 
   // and load the index.html of the app.
