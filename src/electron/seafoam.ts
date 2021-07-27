@@ -14,7 +14,7 @@ export async function fetchDotFromBgv(
 
   try {
     const { stderr } = await exec(
-      `seafoam ${filename}:${phase} render --out ${path}`
+      `seafoam "${filename}:${phase}" render --out "${path}"`
     );
 
     if (stderr) {
