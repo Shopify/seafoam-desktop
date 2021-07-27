@@ -1,16 +1,27 @@
+export interface SeafoamMethod {
+  directory: string;
+  filename: string;
+  id: string;
+  name: string;
+  seafoamNodes: SeafoamNode[];
+}
+
 export default class RootFolder {
   dumps: {
     id: string;
     content: string;
-    methods: { name: string; seafoamNodes: SeafoamNode[] }[];
+    methods: SeafoamMethod[];
   }[];
-  constructor(filepath: string, files: string[]) {
+  constructor(bgvDumpDirectory: string, bgvFileNames: string[]) {
     this.dumps = [
       {
         id: "dump-folder-1",
-        content: filepath.split("/").pop(),
-        methods: files.map((file) => {
+        content: bgvDumpDirectory.split("/").pop(),
+        methods: bgvFileNames.map((file) => {
           return {
+            directory: bgvDumpDirectory,
+            filename: file,
+            id: `${bgvDumpDirectory}/${file}`,
             name: this.#extractMethodName(file.split("/").pop()),
             seafoamNodes: [],
           };
@@ -40,7 +51,7 @@ export class SeafoamNode {
     this.name = name;
   }
 
-  dot(): string {
+  dot(): Dot {
     return `
       digraph G {
         graph [bgcolor="white"];

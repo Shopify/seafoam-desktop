@@ -54,7 +54,7 @@ const primaryMenu: MenuItemConstructorOptions = {
             if (!result.canceled) {
               const directory = result.filePaths[0];
 
-              fs.readdir(directory, (err, files) => {
+              fs.readdir(directory, async (err, files) => {
                 if (err) {
                   console.error(err);
                 } else {

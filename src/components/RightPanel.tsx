@@ -3,19 +3,30 @@ import * as React from "react";
 import { Page, Card } from "@shopify/polaris";
 import { Graphviz } from "graphviz-react";
 import { GraphvizOptions } from "d3-graphviz";
-import RootFolder from "../types/RootFolder";
 import GraphTopBar from "./GraphTopBar";
 import EmptyGraphPlaceholder from "./EmptyGraphPlaceholder";
+import { useEffect, useState } from "react";
+import { IPCEvents, LoadedDotDataPayload } from "../events";
 
 const EMPTY_GRAPH = "digraph {}";
 
 const RightPanel: React.FunctionComponent = () => {
-  const mockRootFolder = new RootFolder("mock/filepath/src/dumps", []);
-  const selectedPhase = mockRootFolder?.dumps[0]?.methods[0]?.seafoamNodes[0];
-  const dot = selectedPhase?.dot() || EMPTY_GRAPH;
-  const dotGraph = <Graphviz dot={dot} options={graphOptions} />;
-  const emptyState = <EmptyGraphPlaceholder />;
-  const doesGraphExist: boolean = dot == EMPTY_GRAPH ? false : true;
+  const [dotData, setDotData] = useState<Dot>(EMPTY_GRAPH);
+
+  const doesGraphExist: boolean = dotData == EMPTY_GRAPH ? false : true;
+
+  useEffect(() => {
+    window.ipc_events.subscribe(
+      IPCEvents.LoadedDotData,
+      (payload: LoadedDotDataPayload) => {
+        setDotData(payload.dotData);
+      }
+    );
+
+    return () => {
+      window.ipc_events.unsubscribe(IPCEvents.LoadedDotData);
+    };
+  });
 
   return (
     <Page title="Graph Panel">
@@ -23,7 +34,13 @@ const RightPanel: React.FunctionComponent = () => {
         <GraphTopBar />
         <br />
         <Card sectioned>
-          <div style={box}>{doesGraphExist ? dotGraph : emptyState}</div>
+          <div style={box}>
+            {doesGraphExist ? (
+              <Graphviz dot={dotData} options={graphOptions} />
+            ) : (
+              <EmptyGraphPlaceholder />
+            )}
+          </div>
         </Card>
       </div>
     </Page>

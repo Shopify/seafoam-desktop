@@ -2,20 +2,23 @@ import * as React from "react";
 import { useState } from "react";
 
 import { Card, OptionList } from "@shopify/polaris";
-import { SeafoamNode } from "../types/RootFolder";
+import { SeafoamMethod } from "../types/RootFolder";
 
 interface Props {
-  listOfBgvFiles: {
-    name: string;
-    seafoamNodes: SeafoamNode[];
-  }[];
+  listOfBgvFiles: SeafoamMethod[];
+  setSelectedFile?: (method: SeafoamMethod) => void;
 }
 
 export default function BgvFileList(props: Props) {
-  const { listOfBgvFiles } = props;
+  const { listOfBgvFiles, setSelectedFile } = props;
   const [selected, setSelected] = useState([]);
-  const mappedBgvFiles = listOfBgvFiles.map((bgvFile) => ({
-    value: bgvFile.name,
+
+  const seafoamMethodMap = new Map(
+    listOfBgvFiles.map((file) => [file.id, file])
+  );
+
+  const listOptions = listOfBgvFiles.map((bgvFile) => ({
+    value: bgvFile.id,
     label: bgvFile.name,
   }));
 
@@ -23,8 +26,15 @@ export default function BgvFileList(props: Props) {
     <Card>
       <OptionList
         title="List of Bgv Files"
-        onChange={setSelected}
-        options={mappedBgvFiles}
+        onChange={(selected) => {
+          if (selected.length === 1) {
+            setSelected(selected);
+            setSelectedFile(seafoamMethodMap.get(selected[0]));
+          } else {
+            throw "Too many selected files";
+          }
+        }}
+        options={listOptions}
         selected={selected}
       />
     </Card>
