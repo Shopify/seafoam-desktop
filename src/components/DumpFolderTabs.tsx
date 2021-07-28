@@ -70,7 +70,7 @@ export default function DumpFolderTabs(props: Props) {
               // TODO (kmenard 22-Jul-21): The phase value should come from the phase chooser widget.
               window.ipc_events.send(IPCEvents.LoadDotData, {
                 filename: `${method.directory}/${method.filename}`,
-                phase: method.name.endsWith("(AST)") ? 0 : 1,
+                phase: method.name.endsWith("(AST)") ? 0 : 8,
               });
 
               setSelectedSeafoamMethod(method);

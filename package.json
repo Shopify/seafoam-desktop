@@ -98,6 +98,7 @@
   "dependencies": {
     "@shopify/polaris": "^6.6.0",
     "d3-graphviz": "^4.0.0",
+    "electron-log": "^4.4.0",
     "electron-squirrel-startup": "^1.0.0",
     "graphviz-react": "^1.2.0",
     "react": "^17.0.2",

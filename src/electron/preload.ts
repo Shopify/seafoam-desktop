@@ -8,15 +8,23 @@
 
 import { contextBridge, ipcRenderer } from "electron";
 import { IPCEvents, IPCPayload } from "../events";
+import ElectronLog from "electron-log";
+
+// Enable IPC logging (must be configured here to work in the renderer process).
+ElectronLog.transports.ipc.level = "silly";
 
 function subscribe<Event extends keyof IPCPayload>(
   event: Event,
   callback: (payload: IPCPayload[Event]) => void
 ) {
+  ElectronLog.debug("IPC subscribe:", event);
+
   ipcRenderer.on(event, (event, args) => callback(args));
 }
 
 function unsubscribe<Event extends keyof IPCPayload>(event: Event) {
+  ElectronLog.debug("IPC unsubscribe:", event);
+
   ipcRenderer.removeAllListeners(event);
 }
 
@@ -24,6 +32,8 @@ function send<Event extends keyof IPCPayload>(
   event: IPCEvents,
   payload: IPCPayload[Event]
 ) {
+  ElectronLog.debug("IPC send:", event, payload);
+
   ipcRenderer.send(event, payload);
 }
 
