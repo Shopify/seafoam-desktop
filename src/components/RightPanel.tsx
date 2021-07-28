@@ -1,16 +1,18 @@
 import * as React from "react";
+import { useContext, useEffect, useState } from "react";
 
-import { Page, Card } from "@shopify/polaris";
+import { Card, Page } from "@shopify/polaris";
 import { Graphviz } from "graphviz-react";
 import { GraphvizOptions } from "d3-graphviz";
 import GraphTopBar from "./GraphTopBar";
 import EmptyGraphPlaceholder from "./EmptyGraphPlaceholder";
-import { useEffect, useState } from "react";
 import { IPCEvents, LoadedDotDataPayload } from "../events";
+import { SelectedDumpFileContext } from "../contexts/SelectedDumpFileContext";
 
 const EMPTY_GRAPH = "digraph {}";
 
 const RightPanel: React.FunctionComponent = () => {
+  const { selectedDumpFile } = useContext(SelectedDumpFileContext);
   const [dotData, setDotData] = useState<Dot>(EMPTY_GRAPH);
 
   const doesGraphExist: boolean = dotData == EMPTY_GRAPH ? false : true;
@@ -23,10 +25,20 @@ const RightPanel: React.FunctionComponent = () => {
       }
     );
 
-    return () => {
-      window.ipc_events.unsubscribe(IPCEvents.LoadedDotData);
-    };
+    return () => window.ipc_events.unsubscribe(IPCEvents.LoadedDotData);
   });
+
+  useEffect(() => {
+    if (selectedDumpFile) {
+      // TODO (kmenard 22-Jul-21): The phase value should come from the phase chooser widget.
+      window.ipc_events.send(IPCEvents.LoadDotData, {
+        filename: `${selectedDumpFile.directory}/${selectedDumpFile.filename}`,
+        phase: 0,
+      });
+
+      return () => window.ipc_events.unsubscribe(IPCEvents.LoadDotData);
+    }
+  }, [selectedDumpFile]);
 
   return (
     <Page title="Graph Panel">

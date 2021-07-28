@@ -11,15 +11,15 @@ export interface IPCPayload {
 }
 
 export interface DirectoryLoadedPayload {
-  directoryName: string;
-  files: string[];
+  directoryName: DumpDirectoryName;
+  files: DumpFileName[];
 }
 
 export interface LoadDotDataPayload {
-  filename: string;
+  filename: DumpFilePath;
   phase: number;
 }
 
 export interface LoadedDotDataPayload {
-  dotData: string;
+  dotData: Dot;
 }

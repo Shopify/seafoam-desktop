@@ -2,7 +2,6 @@ import * as React from "react";
 import { useState } from "react";
 
 import { Card, OptionList } from "@shopify/polaris";
-import { DumpFile } from "../types/DumpDirectoryManager";
 
 interface Props {
   listOfBgvFiles: DumpFile[];
