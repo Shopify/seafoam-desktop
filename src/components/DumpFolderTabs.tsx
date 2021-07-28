@@ -1,29 +1,52 @@
 import * as React from "react";
-import { useCallback, useEffect, useState } from "react";
-
-import { Card, Tabs } from "@shopify/polaris";
-import RootFolder, { SeafoamMethod, SeafoamNode } from "../types/RootFolder";
+import { useCallback, useContext, useEffect, useState } from "react";
+import { Card, Tabs, TabsProps } from "@shopify/polaris";
 import BgvFileList from "./BgvFileList";
 import { DirectoryLoadedPayload, IPCEvents } from "../events";
+import { SelectedDumpFileContext } from "../contexts/SelectedDumpFileContext";
+import { Map } from "immutable";
+import { createDumpFile } from "../lib/DumpFileUtils";
+
+type TabDescriptor = TabsProps["tabs"][0];
+
+const EMPTY_TAB_NAME = "empty";
 
 interface Props {
   methodFilter: string;
 }
 
+function buildTabs(loadedDumps: DumpDirectoryMap): TabDescriptor[] {
+  return Array.from(loadedDumps.keys()).map((directoryName): TabDescriptor => {
+    return {
+      id: directoryName,
+      content: directoryName.split("/").pop(),
+    };
+  });
+}
+
 export default function DumpFolderTabs(props: Props) {
   const methodFilter: string = props.methodFilter;
-  const [selected, setSelected] = useState(0);
-  const [_selectedSeafoamMethod, setSelectedSeafoamMethod] =
-    useState<SeafoamMethod | null>(null);
-  const [rootFolder, setRootFolder] = useState<RootFolder>(
-    new RootFolder("empty", [])
+  const [selectedTabIndex, setSelectedTabIndex] = useState(0);
+  const [dumpDirectoryMap, setDumpDirectoryMap] = useState<DumpDirectoryMap>(
+    Map({ [EMPTY_TAB_NAME]: [] })
   );
+  const { setSelectedDumpFile } = useContext(SelectedDumpFileContext);
 
   useEffect(() => {
     window.ipc_events.subscribe(
       IPCEvents.DirectoryLoaded,
       (payload: DirectoryLoadedPayload) => {
-        setRootFolder(new RootFolder(payload.directoryName, payload.files));
+        const files = payload.files.map((filename) =>
+          createDumpFile(payload.directoryName, filename)
+        );
+
+        if (dumpDirectoryMap.has(EMPTY_TAB_NAME)) {
+          setDumpDirectoryMap(Map({ [payload.directoryName]: files }));
+        } else {
+          setDumpDirectoryMap(
+            dumpDirectoryMap.set(payload.directoryName, files)
+          );
+        }
       }
     );
 
@@ -33,14 +56,14 @@ export default function DumpFolderTabs(props: Props) {
   });
 
   const handleTabChange = useCallback(
-    (selectedTabIndex) => setSelected(selectedTabIndex),
+    (selectedTabIndex) => setSelectedTabIndex(selectedTabIndex),
     []
   );
 
-  const tabs = rootFolder.dumps;
-  const unfilteredList = tabs[selected].methods;
+  const tabs = buildTabs(dumpDirectoryMap);
+  const unfilteredList = dumpDirectoryMap.get(tabs[selectedTabIndex].id);
 
-  function finalListOfBgvFiles(): SeafoamMethod[] {
+  function finalListOfBgvFiles(): DumpFile[] {
     const filteredList = unfilteredList.filter((query) =>
       query.name.includes(methodFilter)
     );
@@ -52,7 +75,6 @@ export default function DumpFolderTabs(props: Props) {
               directory: "",
               filename: "",
               id: "",
-              seafoamNodes: [new SeafoamNode("")],
             },
           ]
         : filteredList;
@@ -62,19 +84,11 @@ export default function DumpFolderTabs(props: Props) {
 
   return (
     <Card>
-      <Tabs tabs={tabs} selected={selected} onSelect={handleTabChange}>
-        <Card.Section title={tabs[selected].content}>
+      <Tabs tabs={tabs} selected={selectedTabIndex} onSelect={handleTabChange}>
+        <Card.Section title={tabs[selectedTabIndex].content}>
           <BgvFileList
             listOfBgvFiles={finalListOfBgvFiles()}
-            setSelectedFile={(method) => {
-              // TODO (kmenard 22-Jul-21): The phase value should come from the phase chooser widget.
-              window.ipc_events.send(IPCEvents.LoadDotData, {
-                filename: `${method.directory}/${method.filename}`,
-                phase: method.name.endsWith("(AST)") ? 0 : 1,
-              });
-
-              setSelectedSeafoamMethod(method);
-            }}
+            setSelectedFile={setSelectedDumpFile}
           />
         </Card.Section>
       </Tabs>

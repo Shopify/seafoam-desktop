@@ -2,6 +2,7 @@ import * as child_process from "child_process";
 import * as fs from "fs";
 import { promisify } from "util";
 import { file } from "tmp-promise";
+import ElectronLog from "electron-log";
 
 export async function fetchDotFromBgv(
   filename: string,
@@ -11,19 +12,24 @@ export async function fetchDotFromBgv(
   const readFile = promisify(fs.readFile);
 
   const { path, cleanup } = await file({ postfix: ".dot" });
+  const command = `seafoam "${filename}:${phase}" render --out "${path}"`;
 
   try {
-    const { stderr } = await exec(
-      `seafoam ${filename}:${phase} render --out ${path}`
-    );
+    ElectronLog.debug("Seafoam command:", command);
+
+    const { stderr } = await exec(command);
 
     if (stderr) {
+      ElectronLog.error(stderr);
       throw stderr;
     }
 
     const buffer = await readFile(path);
+    const dot = buffer.toString("utf-8");
 
-    return buffer.toString("utf-8");
+    ElectronLog.silly("DOT data:", dot);
+
+    return dot;
   } finally {
     cleanup();
   }
