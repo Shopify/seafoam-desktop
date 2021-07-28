@@ -1,33 +1,40 @@
-export interface SeafoamMethod {
+export interface DumpDirectory {
+  id: string;
+  content: string;
+  dump_files: DumpFile[];
+}
+
+export interface DumpFile {
   directory: string;
   filename: string;
   id: string;
   name: string;
-  seafoamNodes: SeafoamNode[];
+  seafoamNodes: SeafoamGraph[];
 }
 
-export default class RootFolder {
-  dumps: {
-    id: string;
-    content: string;
-    methods: SeafoamMethod[];
-  }[];
-  constructor(bgvDumpDirectory: string, bgvFileNames: string[]) {
-    this.dumps = [
-      {
-        id: "dump-folder-1",
-        content: bgvDumpDirectory.split("/").pop(),
-        methods: bgvFileNames.map((file) => {
-          return {
-            directory: bgvDumpDirectory,
-            filename: file,
-            id: `${bgvDumpDirectory}/${file}`,
-            name: this.#extractMethodName(file.split("/").pop()),
-            seafoamNodes: [],
-          };
-        }),
-      },
-    ];
+export default class DumpDirectoryManager {
+  dump_directories: Map<DumpDirectoryName, DumpFile[]>;
+
+  constructor(bgvDumpDirectory: DumpDirectoryName, bgvFileNames: string[]) {
+    this.dump_directories = new Map();
+    this.add_dump_directory(bgvDumpDirectory, bgvFileNames);
+  }
+
+  add_dump_directory(
+    bgvDumpDirectory: DumpDirectoryName,
+    bgvFileNames: string[]
+  ): void {
+    const dumpFiles = bgvFileNames.map((file) => {
+      return {
+        directory: bgvDumpDirectory,
+        filename: file,
+        id: `${bgvDumpDirectory}/${file}`,
+        name: this.#extractMethodName(file.split("/").pop()),
+        seafoamNodes: [],
+      };
+    });
+
+    this.dump_directories.set(bgvDumpDirectory, dumpFiles);
   }
 
   #extractMethodName(filename: string): string {
@@ -45,7 +52,7 @@ export default class RootFolder {
   }
 }
 
-export class SeafoamNode {
+export class SeafoamGraph {
   name: string;
   constructor(name: string) {
     this.name = name;

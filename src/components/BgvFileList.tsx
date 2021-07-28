@@ -2,11 +2,11 @@ import * as React from "react";
 import { useState } from "react";
 
 import { Card, OptionList } from "@shopify/polaris";
-import { SeafoamMethod } from "../types/RootFolder";
+import { DumpFile } from "../types/DumpDirectoryManager";
 
 interface Props {
-  listOfBgvFiles: SeafoamMethod[];
-  setSelectedFile?: (method: SeafoamMethod) => void;
+  listOfBgvFiles: DumpFile[];
+  setSelectedFile?: (method: DumpFile) => void;
 }
 
 export default function BgvFileList(props: Props) {

@@ -1,29 +1,45 @@
 import * as React from "react";
 import { useCallback, useEffect, useState } from "react";
-
-import { Card, Tabs } from "@shopify/polaris";
-import RootFolder, { SeafoamMethod, SeafoamNode } from "../types/RootFolder";
+import { Card, Tabs, TabsProps } from "@shopify/polaris";
+import DumpDirectoryManager, {
+  DumpFile,
+  SeafoamGraph,
+} from "../types/DumpDirectoryManager";
 import BgvFileList from "./BgvFileList";
 import { DirectoryLoadedPayload, IPCEvents } from "../events";
 
+type TabDescriptor = TabsProps["tabs"][0];
+
 interface Props {
   methodFilter: string;
+}
+
+function buildTabs(
+  loadedDumps: Map<DumpDirectoryName, DumpFile[]>
+): TabDescriptor[] {
+  return Array.from(loadedDumps.keys()).map((directoryName): TabDescriptor => {
+    return {
+      id: directoryName,
+      content: directoryName.split("/").pop(),
+    };
+  });
 }
 
 export default function DumpFolderTabs(props: Props) {
   const methodFilter: string = props.methodFilter;
   const [selected, setSelected] = useState(0);
   const [_selectedSeafoamMethod, setSelectedSeafoamMethod] =
-    useState<SeafoamMethod | null>(null);
-  const [rootFolder, setRootFolder] = useState<RootFolder>(
-    new RootFolder("empty", [])
-  );
+    useState<DumpFile | null>(null);
+  const [dumpDirectoryManager, setDumpDirectoryManager] =
+    useState<DumpDirectoryManager>(new DumpDirectoryManager("empty", []));
 
   useEffect(() => {
     window.ipc_events.subscribe(
       IPCEvents.DirectoryLoaded,
       (payload: DirectoryLoadedPayload) => {
-        setRootFolder(new RootFolder(payload.directoryName, payload.files));
+        setDumpDirectoryManager(
+          new DumpDirectoryManager(payload.directoryName, payload.files)
+        );
       }
     );
 
@@ -37,10 +53,12 @@ export default function DumpFolderTabs(props: Props) {
     []
   );
 
-  const tabs = rootFolder.dumps;
-  const unfilteredList = tabs[selected].methods;
+  const tabs = buildTabs(dumpDirectoryManager.dump_directories);
+  const unfilteredList = dumpDirectoryManager.dump_directories.get(
+    tabs[selected].id
+  );
 
-  function finalListOfBgvFiles(): SeafoamMethod[] {
+  function finalListOfBgvFiles(): DumpFile[] {
     const filteredList = unfilteredList.filter((query) =>
       query.name.includes(methodFilter)
     );
@@ -52,7 +70,7 @@ export default function DumpFolderTabs(props: Props) {
               directory: "",
               filename: "",
               id: "",
-              seafoamNodes: [new SeafoamNode("")],
+              seafoamNodes: [new SeafoamGraph("")],
             },
           ]
         : filteredList;
