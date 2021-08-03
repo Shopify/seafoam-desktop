@@ -8,12 +8,14 @@ import GraphTopBar from "./GraphTopBar";
 import EmptyGraphPlaceholder from "./EmptyGraphPlaceholder";
 import { IPCEvents, LoadedDotDataPayload } from "../events";
 import { SelectedDumpFileContext } from "../contexts/SelectedDumpFileContext";
+import { GraphLoading } from "./GraphLoading";
 
 const EMPTY_GRAPH = "digraph {}";
 
 const RightPanel: React.FunctionComponent = () => {
   const { selectedDumpFile } = useContext(SelectedDumpFileContext);
   const [dotData, setDotData] = useState<Dot>(EMPTY_GRAPH);
+  const [isLoading, setIsLoading] = useState(false);
 
   const doesGraphExist: boolean = dotData == EMPTY_GRAPH ? false : true;
 
@@ -22,6 +24,7 @@ const RightPanel: React.FunctionComponent = () => {
       IPCEvents.LoadedDotData,
       (payload: LoadedDotDataPayload) => {
         setDotData(payload.dotData);
+        setIsLoading(false);
       }
     );
 
@@ -30,6 +33,8 @@ const RightPanel: React.FunctionComponent = () => {
 
   useEffect(() => {
     if (selectedDumpFile) {
+      setIsLoading(true);
+
       // TODO (kmenard 22-Jul-21): The phase value should come from the phase chooser widget.
       window.ipc_events.send(IPCEvents.LoadDotData, {
         filename: `${selectedDumpFile.directory}/${selectedDumpFile.filename}`,
@@ -48,7 +53,9 @@ const RightPanel: React.FunctionComponent = () => {
           <div style={cardContainer}>
             <Card sectioned>
               <div style={box}>
-                {doesGraphExist ? (
+                {isLoading ? (
+                  <GraphLoading dumpFile={selectedDumpFile} />
+                ) : doesGraphExist ? (
                   <Graphviz dot={dotData} options={graphOptions} />
                 ) : (
                   <EmptyGraphPlaceholder />
