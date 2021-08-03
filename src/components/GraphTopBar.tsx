@@ -43,10 +43,12 @@ export default function GraphTopBar() {
 }
 
 const row: React.CSSProperties = {
-  flex: 1,
+  flexGrow: 0,
+  flexShrink: 1,
+  flexBasis: "auto",
   display: "flex",
   flexDirection: "row",
-  width: "100%",
+  width: "60vw",
   alignItems: "flex-end",
   justifyContent: "space-around",
 };

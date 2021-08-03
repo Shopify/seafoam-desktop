@@ -2,6 +2,31 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
     Arial, sans-serif;
   margin: auto;
-  max-width: 38rem;
   padding: 2rem;
+}
+
+/* While overriding the height everywhere in the right-hand-panel looks a bit silly, it's necessary for
+ * the graph panel to be able to to fill the remaining space in the viewport vertically.
+ */
+.right-hand-panel,
+.right-hand-panel .Polaris-Card,
+.right-hand-panel .Polaris-Page__Content,
+.right-hand-panel .Polaris-Card__Section,
+.right-hand-panel #graphviz0 {
+  height: 100%;
+}
+
+.right-hand-panel > .Polaris-Page {
+  /* Override to allow the right-hand content to fill the whole viewport. */
+  max-width: 100%;
+
+  /* Layout change to support the graph region filling the remaining viewport vertically. */
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.right-hand-panel .Polaris-TopBar-SearchField {
+  /* Rule override so the graph search box spans the full right side. */
+  max-width: 100% !important;
 }

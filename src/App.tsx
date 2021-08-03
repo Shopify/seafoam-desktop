@@ -41,10 +41,16 @@ const styles = {
     height: "100%",
   },
   left: {
-    flex: 1,
+    flexGrow: 0,
+    flexShrink: 0,
+    flexBasis: "auto",
+    overflow: "scroll",
+    height: "100vh",
+    width: "30vw",
   },
   right: {
     flex: 2,
+    height: "100vh",
   },
 };
 
