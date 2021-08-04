@@ -16,8 +16,15 @@ const RightPanel: React.FunctionComponent = () => {
   const { selectedDumpFile } = useContext(SelectedDumpFileContext);
   const [dotData, setDotData] = useState<Dot>(EMPTY_GRAPH);
   const [isLoading, setIsLoading] = useState(false);
+  const [phase, setPhase] = useState<Nullable<CompilerPhase>>(null);
 
   const doesGraphExist: boolean = dotData == EMPTY_GRAPH ? false : true;
+  let cachedPhase = phase;
+
+  useEffect(() => {
+    setPhase(null);
+    cachedPhase = null;
+  }, [selectedDumpFile]);
 
   useEffect(() => {
     window.ipc_events.subscribe(
@@ -32,24 +39,26 @@ const RightPanel: React.FunctionComponent = () => {
   });
 
   useEffect(() => {
-    if (selectedDumpFile) {
+    if (selectedDumpFile && cachedPhase) {
       setIsLoading(true);
 
-      // TODO (kmenard 22-Jul-21): The phase value should come from the phase chooser widget.
       window.ipc_events.send(IPCEvents.LoadDotData, {
         filename: `${selectedDumpFile.directory}/${selectedDumpFile.filename}`,
-        phase: 0,
+        phase: phase.number,
       });
 
       return () => window.ipc_events.unsubscribe(IPCEvents.LoadDotData);
     }
-  }, [selectedDumpFile]);
+  }, [selectedDumpFile, phase]);
 
   return (
     <div className="right-hand-panel">
       <Page title="Graph Panel">
         <div style={column}>
-          <GraphTopBar />
+          <GraphTopBar
+            selectedDumpFile={selectedDumpFile}
+            onPhaseChange={setPhase}
+          />
           <div style={cardContainer}>
             <Card sectioned>
               <div style={box}>
@@ -72,6 +81,7 @@ const RightPanel: React.FunctionComponent = () => {
 const graphOptions: GraphvizOptions = {
   fit: true,
   zoom: true,
+  totalMemory: 1024 * 1024 * 1024 * 1,
   width: undefined,
   height: undefined,
 };

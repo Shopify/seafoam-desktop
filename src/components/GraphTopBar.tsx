@@ -1,9 +1,26 @@
-import { Select, TopBar } from "@shopify/polaris";
-import React from "react";
+import { Select, SelectOption, TopBar } from "@shopify/polaris";
+import React, { useEffect, useState } from "react";
+import { IPCEvents, LoadedPhaseDataPayload } from "../events";
 
-export default function GraphTopBar() {
-  const [searchValue, setSearchValue] = React.useState("");
-  const [selectedPhase, setSelectedPhase] = React.useState("Phase 1");
+export interface Props {
+  selectedDumpFile: DumpFile;
+  onPhaseChange: (phase: Nullable<CompilerPhase>) => void;
+}
+
+function buildSelectOptions(phases: CompilerPhase[]): SelectOption[] {
+  return phases.map((phase, index) => {
+    return {
+      label: phase.name,
+      value: index.toString(),
+    };
+  });
+}
+
+export default function GraphTopBar(props: Props) {
+  const { onPhaseChange, selectedDumpFile } = props;
+  const [searchValue, setSearchValue] = useState<string>("");
+  const [selectedPhase, setSelectedPhase] = useState<string>("");
+  const [phases, setPhases] = useState<CompilerPhase[]>([]);
 
   const handleSearchValueChange = React.useCallback(
     (value) => setSearchValue(value),
@@ -11,22 +28,50 @@ export default function GraphTopBar() {
   );
 
   const handleSelectPhaseChange = React.useCallback(
-    (value) => setSelectedPhase(value),
-    []
+    (value) => {
+      const phaseNumber = parseInt(value);
+
+      onPhaseChange(phases[phaseNumber]);
+
+      setSelectedPhase(value);
+    },
+    [phases]
   );
 
+  useEffect(() => {
+    setSelectedPhase("");
+  }, [selectedDumpFile]);
+
+  useEffect(() => {
+    if (selectedDumpFile) {
+      window.ipc_events.send(IPCEvents.LoadPhaseData, {
+        filename: `${selectedDumpFile.directory}/${selectedDumpFile.filename}`,
+      });
+
+      return () => window.ipc_events.unsubscribe(IPCEvents.LoadPhaseData);
+    }
+  }, [selectedDumpFile]);
+
+  useEffect(() => {
+    window.ipc_events.subscribe(
+      IPCEvents.LoadedPhaseData,
+      (payload: LoadedPhaseDataPayload) => {
+        setPhases(payload.phases);
+      }
+    );
+
+    return () => window.ipc_events.unsubscribe(IPCEvents.LoadedPhaseData);
+  }, [selectedDumpFile]);
+
   // Fake data
-  const options = [
-    { label: "Phase 1", value: "1" },
-    { label: "Phase 2", value: "2" },
-    { label: "Phase 3", value: "3" },
-  ];
+  const options = buildSelectOptions(phases);
 
   return (
     <div style={row}>
       <div style={picker}>
         <Select
           label="Phase"
+          placeholder="<Select Compiler Phase>"
           onChange={handleSelectPhaseChange}
           value={selectedPhase}
           options={options}

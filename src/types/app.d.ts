@@ -2,6 +2,14 @@ declare module "app" {
   import { Map } from "immutable";
 
   global {
+    interface CompilerPhase {
+      filename: DumpFileName;
+      method: string;
+      name: string;
+      number: number;
+      type: string;
+    }
+
     interface DumpFile {
       directory: string;
       filename: string;
