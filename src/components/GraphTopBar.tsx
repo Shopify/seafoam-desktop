@@ -1,9 +1,28 @@
-import { Select, TopBar } from "@shopify/polaris";
-import React from "react";
+import { Select, SelectOption, TopBar } from "@shopify/polaris";
+import React, { useEffect, useState } from "react";
 
-export default function GraphTopBar() {
-  const [searchValue, setSearchValue] = React.useState("");
-  const [selectedPhase, setSelectedPhase] = React.useState("Phase 1");
+export interface Props {
+  phases: CompilerPhase[];
+  onPhaseChange: (phase: CompilerPhase) => void;
+}
+
+function buildSelectOptions(phases: CompilerPhase[]): SelectOption[] {
+  return phases.map((phase, index) => {
+    return {
+      label: phase.name,
+      value: index.toString(),
+    };
+  });
+}
+
+export default function GraphTopBar(props: Props) {
+  const { onPhaseChange, phases } = props;
+  const [searchValue, setSearchValue] = useState<string>("");
+  const [selectedPhase, setSelectedPhase] = useState<string>("");
+
+  useEffect(() => {
+    setSelectedPhase("");
+  }, [phases]);
 
   const handleSearchValueChange = React.useCallback(
     (value) => setSearchValue(value),
@@ -11,25 +30,25 @@ export default function GraphTopBar() {
   );
 
   const handleSelectPhaseChange = React.useCallback(
-    (value) => setSelectedPhase(value),
-    []
-  );
+    (value) => {
+      const phaseNumber = parseInt(value);
 
-  // Fake data
-  const options = [
-    { label: "Phase 1", value: "1" },
-    { label: "Phase 2", value: "2" },
-    { label: "Phase 3", value: "3" },
-  ];
+      onPhaseChange(phases[phaseNumber]);
+
+      setSelectedPhase(value);
+    },
+    [phases]
+  );
 
   return (
     <div style={row}>
       <div style={picker}>
         <Select
           label="Phase"
+          placeholder="<Select Compiler Phase>"
           onChange={handleSelectPhaseChange}
           value={selectedPhase}
-          options={options}
+          options={buildSelectOptions(phases)}
         />
       </div>
       <div style={search}>
