@@ -1,10 +1,9 @@
 import { Select, SelectOption, TopBar } from "@shopify/polaris";
 import React, { useEffect, useState } from "react";
-import { IPCEvents, LoadedPhaseDataPayload } from "../events";
 
 export interface Props {
-  selectedDumpFile: DumpFile;
-  onPhaseChange: (phase: Nullable<CompilerPhase>) => void;
+  phases: CompilerPhase[];
+  onPhaseChange: (phase: CompilerPhase) => void;
 }
 
 function buildSelectOptions(phases: CompilerPhase[]): SelectOption[] {
@@ -17,10 +16,13 @@ function buildSelectOptions(phases: CompilerPhase[]): SelectOption[] {
 }
 
 export default function GraphTopBar(props: Props) {
-  const { onPhaseChange, selectedDumpFile } = props;
+  const { onPhaseChange, phases } = props;
   const [searchValue, setSearchValue] = useState<string>("");
   const [selectedPhase, setSelectedPhase] = useState<string>("");
-  const [phases, setPhases] = useState<CompilerPhase[]>([]);
+
+  useEffect(() => {
+    setSelectedPhase("");
+  }, [phases]);
 
   const handleSearchValueChange = React.useCallback(
     (value) => setSearchValue(value),
@@ -38,34 +40,6 @@ export default function GraphTopBar(props: Props) {
     [phases]
   );
 
-  useEffect(() => {
-    setSelectedPhase("");
-  }, [selectedDumpFile]);
-
-  useEffect(() => {
-    if (selectedDumpFile) {
-      window.ipc_events.send(IPCEvents.LoadPhaseData, {
-        filename: `${selectedDumpFile.directory}/${selectedDumpFile.filename}`,
-      });
-
-      return () => window.ipc_events.unsubscribe(IPCEvents.LoadPhaseData);
-    }
-  }, [selectedDumpFile]);
-
-  useEffect(() => {
-    window.ipc_events.subscribe(
-      IPCEvents.LoadedPhaseData,
-      (payload: LoadedPhaseDataPayload) => {
-        setPhases(payload.phases);
-      }
-    );
-
-    return () => window.ipc_events.unsubscribe(IPCEvents.LoadedPhaseData);
-  }, [selectedDumpFile]);
-
-  // Fake data
-  const options = buildSelectOptions(phases);
-
   return (
     <div style={row}>
       <div style={picker}>
@@ -74,7 +48,7 @@ export default function GraphTopBar(props: Props) {
           placeholder="<Select Compiler Phase>"
           onChange={handleSelectPhaseChange}
           value={selectedPhase}
-          options={options}
+          options={buildSelectOptions(phases)}
         />
       </div>
       <div style={search}>

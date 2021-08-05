@@ -10,7 +10,7 @@ interface Props {
 
 export default function BgvFileList(props: Props) {
   const { listOfBgvFiles, setSelectedFile } = props;
-  const [selected, setSelected] = useState([]);
+  const [selected, setSelected] = useState<string[]>([]);
 
   const seafoamMethodMap = new Map(
     listOfBgvFiles.map((file) => [file.id, file])

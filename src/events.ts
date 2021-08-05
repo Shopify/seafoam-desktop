@@ -35,3 +35,16 @@ export interface LoadPhaseDataPayload {
 export interface LoadedPhaseDataPayload {
   phases: CompilerPhase[];
 }
+
+export function fetchDotData(dumpFile: DumpFile, phase: CompilerPhase): void {
+  window.ipc_events.send(IPCEvents.LoadDotData, {
+    filename: `${dumpFile.directory}/${dumpFile.filename}`,
+    phase: phase.number,
+  });
+}
+
+export function fetchPhaseList(dumpFile: DumpFile): void {
+  window.ipc_events.send(IPCEvents.LoadPhaseData, {
+    filename: `${dumpFile.directory}/${dumpFile.filename}`,
+  });
+}

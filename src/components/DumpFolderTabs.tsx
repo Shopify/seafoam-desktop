@@ -53,7 +53,7 @@ export default function DumpFolderTabs(props: Props) {
     return () => {
       window.ipc_events.unsubscribe(IPCEvents.DirectoryLoaded);
     };
-  });
+  }, []);
 
   const handleTabChange = useCallback(
     (selectedTabIndex) => setSelectedTabIndex(selectedTabIndex),
