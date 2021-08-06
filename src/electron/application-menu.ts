@@ -1,6 +1,7 @@
 import { app, dialog, Menu, MenuItemConstructorOptions } from "electron";
 import * as fs from "fs";
 import { IPCEvents } from "../events";
+import ElectronLog from "electron-log";
 
 const GRAAL_DUMP_EXTENSION = ".bgv";
 const IS_MAC = process.platform === "darwin";
@@ -46,6 +47,13 @@ const primaryMenu: MenuItemConstructorOptions = {
     {
       label: "Open BGV Directory",
       click: (_menuItem, browserWindow, _event) => {
+        if (!browserWindow) {
+          ElectronLog.error(
+            "'Open BGV Directory' menu opened without an attached browser window."
+          );
+          return;
+        }
+
         dialog
           .showOpenDialog(browserWindow, {
             properties: ["openDirectory", "dontAddToRecent"],

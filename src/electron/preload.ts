@@ -37,7 +37,7 @@ function send<Event extends keyof IPCPayload>(
   ipcRenderer.send(event, payload);
 }
 
-export interface IPC<Event extends keyof IPCPayload> {
+export interface IPC<Event extends IPCEvents> {
   subscribe: (
     event: Event,
     callback: (payload: IPCPayload[Event]) => void

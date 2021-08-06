@@ -61,7 +61,8 @@ export default function DumpFolderTabs(props: Props) {
   );
 
   const tabs = buildTabs(dumpDirectoryMap);
-  const unfilteredList = dumpDirectoryMap.get(tabs[selectedTabIndex].id);
+  const tabId = tabs[selectedTabIndex]?.id;
+  const unfilteredList = dumpDirectoryMap.get(tabId) || [];
 
   function finalListOfBgvFiles(): DumpFile[] {
     const filteredList = unfilteredList.filter((query) =>
