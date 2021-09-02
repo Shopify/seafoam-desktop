@@ -2,9 +2,9 @@ import { app, dialog, Menu, MenuItemConstructorOptions } from "electron";
 import * as fs from "fs";
 import { IPCEvents } from "../events";
 import ElectronLog from "electron-log";
+import { IS_MAC } from "./main";
 
 const GRAAL_DUMP_EXTENSION = ".bgv";
-const IS_MAC = process.platform === "darwin";
 
 const macMenu: MenuItemConstructorOptions = {
   label: app.name,

@@ -3,6 +3,30 @@ import * as fs from "fs";
 import { promisify } from "util";
 import { file } from "tmp-promise";
 import ElectronLog from "electron-log";
+import { dialog } from "electron";
+import { IS_MAC } from "./main";
+
+function isSeafoamCommandException(
+  error: unknown
+): error is SeafoamCommandException {
+  return (error as SeafoamCommandException).stderr !== undefined;
+}
+export function handleSeafoamCommandError(e: unknown, title: string): void {
+  if (e instanceof Error) {
+    const message = isSeafoamCommandException(e)
+      ? e.cmd || e.message
+      : e.message;
+
+    dialog.showMessageBoxSync({
+      type: "error",
+      title: title,
+      message: IS_MAC ? title : message,
+      detail: e.stack,
+    });
+  } else {
+    ElectronLog.error(e);
+  }
+}
 
 export async function fetchDotFromBgv(
   filename: DumpFileName,
