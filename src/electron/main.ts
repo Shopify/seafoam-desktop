@@ -1,4 +1,4 @@
-import { app, ipcMain, BrowserWindow, Menu } from "electron";
+import { app, ipcMain, BrowserWindow, Menu, dialog } from "electron";
 import { applicationMenu } from "./application-menu";
 import { IPCEvents, LoadDotDataPayload, LoadPhaseDataPayload } from "../events";
 import {
@@ -20,6 +20,18 @@ export const IS_MAC = process.platform === "darwin";
 // Configure logging.
 ElectronLog.transports.console.level = "debug";
 ElectronLog.transports.file.level = "error";
+
+ElectronLog.catchErrors({
+  showDialog: false,
+  onError(error: Error) {
+    dialog.showMessageBoxSync({
+      type: "error",
+      title: "An unknown error occurred",
+      message: error.message,
+      detail: error.stack,
+    });
+  },
+});
 
 app.setName("Seafoam");
 app.commandLine.appendSwitch("js-flags", "--max-old-space-size=8192");
