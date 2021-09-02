@@ -1,6 +1,6 @@
 function extractMethodNameFromBgvFilename(filename: DumpFileName): string {
-  const match = filename.match(/\[(.+)\]/)[1];
-  let newName = match || filename;
+  const match = filename.match(/\[(.+)\]/);
+  let newName = match?.[1] || filename;
 
   // This is a rough heuristic that seems to hold up, at least with regards
   // to files from Graal. However, the real information is embedded in the

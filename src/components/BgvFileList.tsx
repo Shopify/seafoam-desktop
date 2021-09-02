@@ -5,7 +5,7 @@ import { Card, OptionList } from "@shopify/polaris";
 
 interface Props {
   listOfBgvFiles: DumpFile[];
-  setSelectedFile?: (method: DumpFile) => void;
+  setSelectedFile: (method: DumpFile) => void;
 }
 
 export default function BgvFileList(props: Props) {
@@ -25,10 +25,21 @@ export default function BgvFileList(props: Props) {
     <Card>
       <OptionList
         title="List of Bgv Files"
-        onChange={(selected) => {
-          if (selected.length === 1) {
-            setSelected(selected);
-            setSelectedFile(seafoamMethodMap.get(selected[0]));
+        onChange={(selectedIds) => {
+          if (selectedIds.length === 1) {
+            setSelected(selectedIds);
+
+            const selectedId = selectedIds[0];
+            const selectedMethod = seafoamMethodMap.get(selectedId);
+
+            if (selectedMethod) {
+              setSelectedFile(selectedMethod);
+            } else {
+              console.error(
+                `Selected ID '${selectedId}' not found in list of dump files`,
+                seafoamMethodMap
+              );
+            }
           } else {
             throw "Too many selected files";
           }

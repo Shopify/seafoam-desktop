@@ -85,5 +85,5 @@ export async function fetchCompilerPhases(
         type: type,
       };
     })
-    .filter((phase_info) => phase_info !== null);
+    .filter((phase_info): phase_info is CompilerPhase => !!phase_info);
 }
