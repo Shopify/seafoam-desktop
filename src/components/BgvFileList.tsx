@@ -35,7 +35,7 @@ export default function BgvFileList(props: Props) {
             if (selectedMethod) {
               setSelectedFile(selectedMethod);
             } else {
-              console.error(
+              window.logger.error(
                 `Selected ID '${selectedId}' not found in list of dump files`,
                 seafoamMethodMap
               );

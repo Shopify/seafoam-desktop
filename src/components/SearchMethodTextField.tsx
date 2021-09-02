@@ -14,7 +14,7 @@ export default function SearchMethodTextField(props: Props) {
 
   function handleMethodSearch() {
     props.methodFilter(textFieldValue);
-    console.log(textFieldValue);
+    window.logger.log(textFieldValue);
   }
 
   return (

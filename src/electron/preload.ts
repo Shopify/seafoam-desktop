@@ -51,3 +51,5 @@ contextBridge.exposeInMainWorld("ipc_events", {
   unsubscribe: unsubscribe,
   send: send,
 });
+
+contextBridge.exposeInMainWorld("logger", ElectronLog);
