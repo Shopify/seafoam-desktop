@@ -9,8 +9,8 @@
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
-    "lint": "eslint --max-warnings 0 --ignore-path .gitignore --ext .js,.ts,.tsx .",
-    "lint:fix": "eslint --fix --ignore-path .gitignore --ext .js,.ts,.tsx .",
+    "lint": "eslint --max-warnings 0 --ignore-path .gitignore --ext .js,.jsx,.ts,.tsx .",
+    "lint:fix": "eslint --fix --ignore-path .gitignore --ext .js,.jsx,.ts,.tsx .",
     "prettier": "prettier --list-different .",
     "prettier:fix": "prettier --write .",
     "prepare": "husky install"
