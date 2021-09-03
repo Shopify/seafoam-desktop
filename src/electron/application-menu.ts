@@ -2,9 +2,9 @@ import { app, dialog, Menu, MenuItemConstructorOptions } from "electron";
 import * as fs from "fs";
 import { IPCEvents } from "../events";
 import ElectronLog from "electron-log";
+import { IS_MAC } from "./main";
 
 const GRAAL_DUMP_EXTENSION = ".bgv";
-const IS_MAC = process.platform === "darwin";
 
 const macMenu: MenuItemConstructorOptions = {
   label: app.name,
@@ -39,7 +39,7 @@ const primaryMenu: MenuItemConstructorOptions = {
           .then((result) => {
             if (!result.canceled) {
               const filename = result.filePaths[0];
-              console.debug(filename);
+              ElectronLog.debug(filename);
             }
           });
       },
@@ -64,7 +64,7 @@ const primaryMenu: MenuItemConstructorOptions = {
 
               fs.readdir(directory, async (err, files) => {
                 if (err) {
-                  console.error(err);
+                  ElectronLog.error(err);
                 } else {
                   const dumpFiles = files.filter((file) =>
                     file.endsWith(GRAAL_DUMP_EXTENSION)

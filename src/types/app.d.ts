@@ -1,5 +1,6 @@
 declare module "app" {
   import { Map } from "immutable";
+  import ExecException from "child_process";
 
   global {
     interface CompilerPhase {
@@ -25,5 +26,10 @@ declare module "app" {
 
     type Nullable<T> = T | null;
     type Option<T> = T | undefined;
+
+    interface SeafoamCommandException extends ExecException.ExecException {
+      stderr: string | Buffer;
+      stdout: string | Buffer;
+    }
   }
 }
