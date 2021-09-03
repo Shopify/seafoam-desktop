@@ -4,6 +4,7 @@ export const enum IPCEvents {
   LoadedDotData = "loaded-dot-data",
   LoadPhaseData = "load-phase-data",
   LoadedPhaseData = "loaded-phase-data",
+  OpenDirectoryChooser = "open-directory-chooser",
 }
 
 export interface IPCPayload {
@@ -12,6 +13,7 @@ export interface IPCPayload {
   [IPCEvents.LoadedDotData]: LoadedDotDataPayload;
   [IPCEvents.LoadPhaseData]: LoadPhaseDataPayload;
   [IPCEvents.LoadedPhaseData]: LoadedPhaseDataPayload;
+  [IPCEvents.OpenDirectoryChooser]: never;
 }
 
 export interface DirectoryLoadedPayload {
@@ -47,4 +49,8 @@ export function fetchPhaseList(dumpFile: DumpFile): void {
   window.ipc_events.send(IPCEvents.LoadPhaseData, {
     filename: `${dumpFile.directory}/${dumpFile.filename}`,
   });
+}
+
+export function openDirectoryChooser(): void {
+  window.ipc_events.send(IPCEvents.OpenDirectoryChooser, []);
 }

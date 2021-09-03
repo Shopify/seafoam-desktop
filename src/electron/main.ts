@@ -1,5 +1,5 @@
 import { app, ipcMain, BrowserWindow, Menu, dialog } from "electron";
-import { applicationMenu } from "./application-menu";
+import { applicationMenu, openDirectoryChooser } from "./application-menu";
 import { IPCEvents, LoadDotDataPayload, LoadPhaseDataPayload } from "../events";
 import {
   fetchCompilerPhases,
@@ -114,3 +114,16 @@ ipcMain.on(
     }
   }
 );
+
+ipcMain.on(IPCEvents.OpenDirectoryChooser, async (event) => {
+  const browserWindow = BrowserWindow.fromId(event.sender.id);
+
+  if (browserWindow) {
+    openDirectoryChooser(browserWindow);
+  } else {
+    dialog.showErrorBox(
+      "Unknown error occurred",
+      "Unable to open the system directory chooser"
+    );
+  }
+});
