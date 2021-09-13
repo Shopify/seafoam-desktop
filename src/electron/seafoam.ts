@@ -85,27 +85,53 @@ export async function fetchCompilerPhases(
       }
 
       // Split on the first run of white spaces.
-      const [part1, part2] = line.split(/(?<=^\S+)\s+/);
-      const [filename, phase_number] = part1.split(":");
+      const [leftColumn, rightColumn] = line.split(/(?<=^\S+)\s+/);
 
-      // _type will generally be "TruffleAST" or "TruffleIR".
-      const [type, rest] = part2.split("::");
+      // The left column will look like:
+      //
+      // /tmp/TruffleHotSpotCompilation-10507[block_in_Truffle::EncodingOperations.build_encoding_map_<split-740a3cae>].bgv:0
+      // \________________________________________________________________________________________________________________/ ^                                                                                                           ^  ^
+      //                                               Filename                                                             |
+      //                                                                                                                   /
+      //                                                                                                       Phase number
+      //
+      // The last `:` separates the filename from the phase number.
+      const leftColumnSplitPoint = leftColumn.lastIndexOf(":");
 
-      // It's possible for `rest` to have more than two "/", but that only happens
-      // when there are call tree phases as well. Since Seafoam doesn't have a way
-      // to process the call tree phases, we can ignore the phase names (i.e., the
-      // data being dropped by the split limit).
-      const [method, phase_name] = rest.split("/", 2);
+      const filename = leftColumn.substring(0, leftColumnSplitPoint);
+      const phaseNumber = leftColumn.substring(leftColumnSplitPoint + 1);
 
-      if (phase_name === "Call Tree") {
+      // The right column will look like:
+      //
+      // TruffleIR::block_in_Truffle::EncodingOperations_build_encoding_map_<split-740a3cae>()/Call Tree/Before Inline
+      // \_______/  \________________________________________________________________________/ \_____________________/
+      //   Type                                      Method name                                   Phase name
+      //
+      // This line has two split points. The first one is the first occurrence of `::`. The part to the left indicates
+      // what type of nodes are displayed (e.g., TruffleIR or TruffleAST). The remaining part of the string is the
+      // <method_name>/<phase_name>. The phase name may have a `/` embedded in it, so we need to be careful to match on
+      // the first occurrence. That assumes the method name does not contain a `/` in it. To date, we have not seen one
+      // that does.
+      const rightColumnSplitPoint1 = rightColumn.indexOf("::");
+      const rightColumnSplitPoint2 = rightColumn.indexOf("/");
+
+      const type = rightColumn.substring(0, rightColumnSplitPoint1);
+      const method = rightColumn.substring(
+        rightColumnSplitPoint1 + 2,
+        rightColumnSplitPoint2
+      );
+      const phaseName = rightColumn.substring(rightColumnSplitPoint2 + 1);
+
+      // Seafoam doesn't currently have a way to process the "Call Tree" phases, so we ignore them.
+      if (phaseName === "Call Tree") {
         return null;
       }
 
       return {
         filename: filename,
         method: method.split("()")[0],
-        name: phase_name,
-        number: parseInt(phase_number),
+        name: phaseName,
+        number: parseInt(phaseNumber),
         type: type,
       };
     })
