@@ -1,4 +1,10 @@
-import { app, dialog, Menu, MenuItemConstructorOptions } from "electron";
+import {
+  app,
+  BrowserWindow,
+  dialog,
+  Menu,
+  MenuItemConstructorOptions,
+} from "electron";
 import * as fs from "fs";
 import { IPCEvents } from "../events";
 import ElectronLog from "electron-log";
@@ -17,6 +23,42 @@ const macMenu: MenuItemConstructorOptions = {
     },
   ],
 };
+
+export function openDirectoryChooser(
+  browserWindow: Option<BrowserWindow>
+): void {
+  if (!browserWindow) {
+    ElectronLog.error(
+      "'Open BGV Directory' menu opened without an attached browser window."
+    );
+    return;
+  }
+
+  dialog
+    .showOpenDialog(browserWindow, {
+      properties: ["openDirectory", "dontAddToRecent"],
+    })
+    .then((result) => {
+      if (!result.canceled) {
+        const directory = result.filePaths[0];
+
+        fs.readdir(directory, async (err, files) => {
+          if (err) {
+            ElectronLog.error(err);
+          } else {
+            const dumpFiles = files.filter((file) =>
+              file.endsWith(GRAAL_DUMP_EXTENSION)
+            );
+
+            browserWindow.webContents.send(IPCEvents.DirectoryLoaded, {
+              directoryName: directory,
+              files: dumpFiles,
+            });
+          }
+        });
+      }
+    });
+}
 
 const primaryMenu: MenuItemConstructorOptions = {
   label: "File",
@@ -47,37 +89,7 @@ const primaryMenu: MenuItemConstructorOptions = {
     {
       label: "Open BGV Directory",
       click: (_menuItem, browserWindow, _event) => {
-        if (!browserWindow) {
-          ElectronLog.error(
-            "'Open BGV Directory' menu opened without an attached browser window."
-          );
-          return;
-        }
-
-        dialog
-          .showOpenDialog(browserWindow, {
-            properties: ["openDirectory", "dontAddToRecent"],
-          })
-          .then((result) => {
-            if (!result.canceled) {
-              const directory = result.filePaths[0];
-
-              fs.readdir(directory, async (err, files) => {
-                if (err) {
-                  ElectronLog.error(err);
-                } else {
-                  const dumpFiles = files.filter((file) =>
-                    file.endsWith(GRAAL_DUMP_EXTENSION)
-                  );
-
-                  browserWindow.webContents.send(IPCEvents.DirectoryLoaded, {
-                    directoryName: directory,
-                    files: dumpFiles,
-                  });
-                }
-              });
-            }
-          });
+        openDirectoryChooser(browserWindow);
       },
     },
   ],
