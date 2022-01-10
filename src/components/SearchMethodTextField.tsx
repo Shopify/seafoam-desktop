@@ -20,6 +20,7 @@ export default function SearchMethodTextField(props: Props) {
   return (
     <div>
       <TextField
+        autoComplete="off"
         label="Search Methods"
         value={textFieldValue}
         onChange={handleTextFieldChange}
