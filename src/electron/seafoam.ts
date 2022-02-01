@@ -63,7 +63,7 @@ export async function fetchCompilerPhases(
   filename: DumpFileName
 ): Promise<CompilerPhase[]> {
   const exec = promisify(child_process.exec);
-  const command = `seafoam "${filename}" list`;
+  const command = `seafoam --json "${filename}" list`;
 
   ElectronLog.debug("Seafoam command:", command);
 
@@ -76,64 +76,25 @@ export async function fetchCompilerPhases(
 
   ElectronLog.debug("Compiler phases:", stdout);
 
-  const lines = stdout.split("\n");
+  const decoded: SeafoamCompilerPhase[] = JSON.parse(stdout);
 
-  return lines
-    .map((line) => {
-      if (line.trim() === "") {
-        return null;
-      }
+  // Seafoam doesn't currently have a way to process the "Call Tree" phases, so we ignore them.
+  const validPhases = decoded.filter(
+    (phase) => phase.graph_name_components[1] !== "Call Tree"
+  );
 
-      // Split on the first run of white spaces.
-      const [leftColumn, rightColumn] = line.split(/(?<=^\S+)\s+/);
+  const phases = validPhases.map((phase) => {
+    // The type value indicates what type of graph (e.g., TruffleIR or TruffleAST) was generated for this method.
+    const [type, methodName] = phase.graph_name_components[0].split("::");
 
-      // The left column will look like:
-      //
-      // /tmp/TruffleHotSpotCompilation-10507[block_in_Truffle::EncodingOperations.build_encoding_map_<split-740a3cae>].bgv:0
-      // \________________________________________________________________________________________________________________/ ^                                                                                                           ^  ^
-      //                                               Filename                                                             |
-      //                                                                                                                   /
-      //                                                                                                       Phase number
-      //
-      // The last `:` separates the filename from the phase number.
-      const leftColumnSplitPoint = leftColumn.lastIndexOf(":");
+    return {
+      filename: phase.graph_file,
+      method: methodName.split("()")[0],
+      name: phase.graph_name_components.slice(1).join("/"),
+      number: phase.graph_index,
+      type: type,
+    };
+  });
 
-      const filename = leftColumn.substring(0, leftColumnSplitPoint);
-      const phaseNumber = leftColumn.substring(leftColumnSplitPoint + 1);
-
-      // The right column will look like:
-      //
-      // TruffleIR::block_in_Truffle::EncodingOperations_build_encoding_map_<split-740a3cae>()/Call Tree/Before Inline
-      // \_______/  \________________________________________________________________________/ \_____________________/
-      //   Type                                      Method name                                   Phase name
-      //
-      // This line has two split points. The first one is the first occurrence of `::`. The part to the left indicates
-      // what type of nodes are displayed (e.g., TruffleIR or TruffleAST). The remaining part of the string is the
-      // <method_name>/<phase_name>. The phase name may have a `/` embedded in it, so we need to be careful to match on
-      // the first occurrence. That assumes the method name does not contain a `/` in it. To date, we have not seen one
-      // that does.
-      const rightColumnSplitPoint1 = rightColumn.indexOf("::");
-      const rightColumnSplitPoint2 = rightColumn.indexOf("/");
-
-      const type = rightColumn.substring(0, rightColumnSplitPoint1);
-      const method = rightColumn.substring(
-        rightColumnSplitPoint1 + 2,
-        rightColumnSplitPoint2
-      );
-      const phaseName = rightColumn.substring(rightColumnSplitPoint2 + 1);
-
-      // Seafoam doesn't currently have a way to process the "Call Tree" phases, so we ignore them.
-      if (phaseName === "Call Tree") {
-        return null;
-      }
-
-      return {
-        filename: filename,
-        method: method.split("()")[0],
-        name: phaseName,
-        number: parseInt(phaseNumber),
-        type: type,
-      };
-    })
-    .filter((phase_info): phase_info is CompilerPhase => !!phase_info);
+  return phases;
 }

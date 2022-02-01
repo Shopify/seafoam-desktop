@@ -11,6 +11,12 @@ declare module "app" {
       type: string;
     }
 
+    interface SeafoamCompilerPhase {
+      graph_index: number;
+      graph_file: DumpFileName;
+      graph_name_components: string[];
+    }
+
     interface DumpFile {
       directory: string;
       filename: string;
