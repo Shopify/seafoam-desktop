@@ -1,41 +1,21 @@
-import { Select, SelectOption, TopBar } from "@shopify/polaris";
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { Input, Select } from "antd";
+
+const { Search } = Input;
 
 export interface Props {
   phases: CompilerPhase[];
   onPhaseChange: (phase: CompilerPhase) => void;
 }
 
-function buildSelectOptions(phases: CompilerPhase[]): SelectOption[] {
-  return phases.map((phase, index) => {
-    return {
-      label: phase.name,
-      value: index.toString(),
-    };
-  });
-}
-
 export default function GraphTopBar(props: Props) {
   const { onPhaseChange, phases } = props;
-  const [searchValue, setSearchValue] = useState<string>("");
-  const [selectedPhase, setSelectedPhase] = useState<string>("");
-
-  useEffect(() => {
-    setSelectedPhase("");
-  }, [phases]);
-
-  const handleSearchValueChange = React.useCallback(
-    (value) => setSearchValue(value),
-    []
-  );
 
   const handleSelectPhaseChange = React.useCallback(
     (value) => {
       const phaseNumber = parseInt(value);
 
       onPhaseChange(phases[phaseNumber]);
-
-      setSelectedPhase(value);
     },
     [phases]
   );
@@ -44,18 +24,18 @@ export default function GraphTopBar(props: Props) {
     <div style={row}>
       <div style={picker}>
         <Select
-          label="Phase"
           placeholder="<Select Compiler Phase>"
           onChange={handleSelectPhaseChange}
-          value={selectedPhase}
-          options={buildSelectOptions(phases)}
+          options={phases.map((phase, index) => {
+            return {
+              label: phase.name,
+              value: index.toString(),
+            };
+          })}
         />
       </div>
       <div style={search}>
-        <TopBar.SearchField
-          value={searchValue}
-          onChange={handleSearchValueChange}
-        />
+        <Search onSearch={() => alert("Not yet implemented")} />
       </div>
     </div>
   );

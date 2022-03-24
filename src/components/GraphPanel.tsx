@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Graphviz } from "graphviz-react";
 import GraphTopBar from "./GraphTopBar";
-import { Card } from "@shopify/polaris";
 import { GraphLoading } from "./GraphLoading";
 import { GraphvizOptions } from "d3-graphviz";
 import { fetchDotData, IPCEvents, LoadedDotDataPayload } from "../events";
 import { ChoosePhaseCTA } from "./ChoosePhaseCTA";
+import { Card } from "antd";
 
 interface Props {
   dumpFile: DumpFile;
@@ -45,7 +45,7 @@ export function GraphPanel(props: Props) {
         }}
       />
       <div style={cardContainer}>
-        <Card sectioned>
+        <Card>
           <div style={box}>
             {!phase ? (
               <ChoosePhaseCTA />
