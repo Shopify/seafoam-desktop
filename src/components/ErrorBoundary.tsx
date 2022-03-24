@@ -1,5 +1,5 @@
 import React, { ErrorInfo, PropsWithChildren } from "react";
-import { Banner, Card } from "@shopify/polaris";
+import { Result } from "antd";
 
 interface State {
   error: Nullable<Error>;
@@ -24,13 +24,11 @@ export class ErrorBoundary extends React.Component<
   override render() {
     if (this.state.error) {
       return (
-        <>
-          <Banner status="critical" title="An unexpected error occurred">
-            <div>{this.state.error}</div>
-            <div>{this.state.errorInfo?.componentStack}</div>
-          </Banner>
-          <Card>
-            <Card.Section>
+        <Result
+          status="500"
+          title="An unexpected error occurred"
+          subTitle={
+            <div>
               <p>
                 Please report the error to the{" "}
                 <a
@@ -45,9 +43,15 @@ export class ErrorBoundary extends React.Component<
                 Unfortunately, this error is fatal and you will need to restart
                 the application.
               </p>
-            </Card.Section>
-          </Card>
-        </>
+            </div>
+          }
+          extra={
+            <div>
+              <span>{this.state.error.message}:</span>
+              <pre>{this.state.error.stack}</pre>
+            </div>
+          }
+        ></Result>
       );
     }
 
