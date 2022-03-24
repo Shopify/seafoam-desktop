@@ -97,6 +97,7 @@
   },
   "dependencies": {
     "@shopify/polaris": "^8.0.0",
+    "antd": "^4.19.3",
     "d3-graphviz": "^4.0.0",
     "electron-log": "^4.4.5",
     "electron-squirrel-startup": "^1.0.0",
