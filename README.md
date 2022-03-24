@@ -1,3 +1,4 @@
+
 Seafoam GUI
 ===========
 
@@ -16,7 +17,7 @@ list of technologies used in this project are:
 * Electron Forge
 * TypeScript
 * Node
-* Polaris Design System
+* Ant Design System
 
 To get started:
 

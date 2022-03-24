@@ -27,6 +27,5 @@
  */
 
 import "./index.css";
-import "@shopify/polaris/build/esm/styles.css";
 
 import "./App";

@@ -1,7 +1,5 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import enTranslations from "@shopify/polaris/locales/en.json";
-import { AppProvider } from "@shopify/polaris";
 import LeftPanel from "./components/LeftPanel";
 import RightPanel from "./components/RightPanel";
 import { SelectedDumpFileProvider } from "./contexts/SelectedDumpFileContext";
@@ -13,20 +11,18 @@ const App = () => {
 
   return (
     <div style={styles.app as React.CSSProperties}>
-      <AppProvider i18n={enTranslations}>
-        <ErrorBoundary>
-          <SelectedDumpFileProvider>
-            <div style={styles.box as React.CSSProperties}>
-              <div style={styles.left as React.CSSProperties}>
-                <LeftPanel />
-              </div>
-              <div style={styles.right as React.CSSProperties}>
-                <RightPanel />
-              </div>
+      <ErrorBoundary>
+        <SelectedDumpFileProvider>
+          <div style={styles.box as React.CSSProperties}>
+            <div style={styles.left as React.CSSProperties}>
+              <LeftPanel />
             </div>
-          </SelectedDumpFileProvider>
-        </ErrorBoundary>
-      </AppProvider>
+            <div style={styles.right as React.CSSProperties}>
+              <RightPanel />
+            </div>
+          </div>
+        </SelectedDumpFileProvider>
+      </ErrorBoundary>
     </div>
   );
 };
