@@ -11,14 +11,12 @@ body {
  * the graph panel to be able to to fill the remaining space in the viewport vertically.
  */
 .right-hand-panel,
-.right-hand-panel .Polaris-Card,
-.right-hand-panel .Polaris-Page__Content,
-.right-hand-panel .Polaris-Card__Section,
+.right-hand-panel .ant-card,
 .right-hand-panel #graphviz0 {
   height: 100%;
 }
 
-.right-hand-panel > .Polaris-Page {
+.right-hand-panel > .ant-card {
   /* Override to allow the right-hand content to fill the whole viewport. */
   max-width: 100%;
 

@@ -1,9 +1,9 @@
 import * as React from "react";
 
-import { Page } from "@shopify/polaris";
 import DumpFolderTabs from "./DumpFolderTabs";
 import SearchMethodTextField from "./SearchMethodTextField";
 import { useState } from "react";
+import { Card } from "antd";
 
 const LeftPanel: React.FunctionComponent = () => {
   const [query, setQuery] = useState("");
@@ -12,11 +12,11 @@ const LeftPanel: React.FunctionComponent = () => {
   };
 
   return (
-    <Page title="Graal Dump Folders">
+    <Card title="Graal Dump Folders">
       <SearchMethodTextField methodFilter={methodFilter} />
       <br />
       <DumpFolderTabs methodFilter={query} />
-    </Page>
+    </Card>
   );
 };
 

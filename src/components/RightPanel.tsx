@@ -1,11 +1,11 @@
 import * as React from "react";
 import { useContext, useEffect, useState } from "react";
 
-import { Page } from "@shopify/polaris";
 import EmptyGraphPlaceholder from "./EmptyGraphPlaceholder";
 import { fetchPhaseList, IPCEvents, LoadedPhaseDataPayload } from "../events";
 import { SelectedDumpFileContext } from "../contexts/SelectedDumpFileContext";
 import { GraphPanel } from "./GraphPanel";
+import { Card } from "antd";
 
 const RightPanel: React.FunctionComponent = () => {
   const { selectedDumpFile } = useContext(SelectedDumpFileContext);
@@ -34,7 +34,7 @@ const RightPanel: React.FunctionComponent = () => {
 
   return (
     <div className="right-hand-panel">
-      <Page title="Graph Panel">
+      <Card title="Graph Panel">
         {selectedDumpFile ? (
           <GraphPanel
             dumpFile={selectedDumpFile}
@@ -43,7 +43,7 @@ const RightPanel: React.FunctionComponent = () => {
         ) : (
           <EmptyGraphPlaceholder />
         )}
-      </Page>
+      </Card>
     </div>
   );
 };
