@@ -1,13 +1,13 @@
 import * as React from "react";
 import { useCallback, useContext, useEffect, useState } from "react";
-import { Card, Tabs, TabsProps } from "@shopify/polaris";
 import BgvFileList from "./BgvFileList";
 import { DirectoryLoadedPayload, IPCEvents } from "../events";
 import { SelectedDumpFileContext } from "../contexts/SelectedDumpFileContext";
 import { Map } from "immutable";
 import { createDumpFile } from "../lib/DumpFileUtils";
+import { Card, Tabs } from "antd";
 
-type TabDescriptor = TabsProps["tabs"][0];
+const { TabPane } = Tabs;
 
 const EMPTY_TAB_NAME = "empty";
 
@@ -15,8 +15,8 @@ interface Props {
   methodFilter: string;
 }
 
-function buildTabs(loadedDumps: DumpDirectoryMap): TabDescriptor[] {
-  return Array.from(loadedDumps.keys()).map((directoryName): TabDescriptor => {
+function buildTabs(loadedDumps: DumpDirectoryMap) {
+  return Array.from(loadedDumps.keys()).map((directoryName) => {
     return {
       id: directoryName,
       content: directoryName.split("/").pop(),
@@ -85,13 +85,15 @@ export default function DumpFolderTabs(props: Props) {
 
   return (
     <Card>
-      <Tabs tabs={tabs} selected={selectedTabIndex} onSelect={handleTabChange}>
-        <Card.Section title={tabs[selectedTabIndex].content}>
-          <BgvFileList
-            listOfBgvFiles={finalListOfBgvFiles()}
-            setSelectedFile={setSelectedDumpFile}
-          />
-        </Card.Section>
+      <Tabs onSelect={handleTabChange}>
+        {tabs.map((tab) => (
+          <TabPane tab={tab.content}>
+            <BgvFileList
+              listOfBgvFiles={finalListOfBgvFiles()}
+              setSelectedFile={setSelectedDumpFile}
+            />
+          </TabPane>
+        ))}
       </Tabs>
     </Card>
   );
