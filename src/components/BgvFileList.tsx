@@ -1,45 +1,119 @@
 import * as React from "react";
 
-import { Card, Tree } from "antd";
+import { Tree } from "antd";
+import { LoadedPhaseDataPayload } from "../events";
+import { PartitionOutlined } from "@ant-design/icons";
+import { TreeProps } from "rc-tree";
+import { DataNode, EventDataNode } from "rc-tree/lib/interface";
+import { GraphDataSourceContext } from "../contexts/GraphDataSourceContext";
+import { useContext } from "react";
+
+type OnSelectCallback = TreeProps<CompilerPhaseTreeDataNode>["onSelect"];
+
+interface CompilerPhaseTreeDataNode extends DataNode {
+  children?: CompilerPhaseTreeDataNode[];
+  dumpFile: DumpFile;
+  phase?: CompilerPhase;
+}
 
 interface Props {
   listOfBgvFiles: DumpFile[];
-  setSelectedFile: (method: DumpFile) => void;
 }
 
 export default function BgvFileList(props: Props) {
-  const { listOfBgvFiles, setSelectedFile } = props;
+  const { listOfBgvFiles } = props;
+  const { setGraphDataSource } = useContext(GraphDataSourceContext);
 
-  const seafoamMethodMap = new Map(
-    listOfBgvFiles.map((file) => [file.id, file])
-  );
-
-  const treeData = listOfBgvFiles.map((bgvFile) => ({
+  const initialTreeData = listOfBgvFiles.map((bgvFile) => ({
     title: bgvFile.name,
     key: bgvFile.id,
+    selectable: false,
+    dumpFile: bgvFile,
   }));
 
-  const onSelect = (selectedIds: React.Key[]) => {
-    if (selectedIds.length === 1) {
-      const selectedId = selectedIds[0];
-      const selectedMethod = seafoamMethodMap.get(selectedId.toString());
+  const [treeData, setTreeData] =
+    React.useState<CompilerPhaseTreeDataNode[]>(initialTreeData);
 
-      if (selectedMethod) {
-        setSelectedFile(selectedMethod);
-      } else {
-        window.logger.error(
-          `Selected ID '${selectedId}' not found in list of dump files`,
-          seafoamMethodMap
-        );
+  const updateTreeData = (
+    list: CompilerPhaseTreeDataNode[],
+    key: React.Key,
+    children: CompilerPhaseTreeDataNode[]
+  ): CompilerPhaseTreeDataNode[] => {
+    return list.map((node) => {
+      if (node.key === key) {
+        return {
+          ...node,
+          children,
+        };
       }
-    } else {
+
+      if (node.children) {
+        return {
+          ...node,
+          children: updateTreeData(node.children, key, children),
+        };
+      }
+
+      return node;
+    });
+  };
+
+  const onLoadData = (node: EventDataNode): Promise<void> =>
+    new Promise<void>((resolve) => {
+      const { key, children } = node;
+
+      if (children) {
+        resolve();
+        return;
+      }
+
+      if ("dumpFile" in node) {
+        const { dumpFile } = node as EventDataNode & CompilerPhaseTreeDataNode;
+
+        // Fetch list of phases here.
+        return window.ipc_events
+          .fetchPhases({ filename: key })
+          .then(({ phases }: LoadedPhaseDataPayload) => {
+            setTreeData(
+              updateTreeData(
+                treeData,
+                key,
+                phases.map((phase) => ({
+                  title: phase.name,
+                  key: `${dumpFile.id}:${phase.number}`,
+                  isLeaf: true,
+                  icon: <PartitionOutlined />,
+                  selectable: true,
+                  dumpFile: dumpFile,
+                  phase: phase,
+                }))
+              )
+            );
+
+            resolve();
+          });
+      } else {
+        throw "Tree node is missing 'dumpFile'.";
+      }
+    });
+
+  const onSelect: OnSelectCallback = (selectedKeys, info) => {
+    if (selectedKeys.length === 1) {
+      const node = info.selectedNodes[0];
+      const { dumpFile, phase } = node;
+
+      setGraphDataSource({ dumpFile, compilerPhase: phase! });
+    } else if (selectedKeys.length > 1) {
       throw "Too many selected files";
     }
   };
 
   return (
-    <Card style={{ padding: 0 }}>
-      <Tree treeData={treeData} onSelect={onSelect} />
-    </Card>
+    <Tree<CompilerPhaseTreeDataNode>
+      treeData={treeData}
+      loadData={onLoadData}
+      onSelect={onSelect}
+      showIcon={true}
+    />
   );
 }

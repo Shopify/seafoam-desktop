@@ -2,10 +2,10 @@ import * as React from "react";
 import { useCallback, useContext, useEffect, useState } from "react";
 import BgvFileList from "./BgvFileList";
 import { DirectoryLoadedPayload, IPCEvents } from "../events";
-import { SelectedDumpFileContext } from "../contexts/SelectedDumpFileContext";
 import { Map } from "immutable";
 import { createDumpFile } from "../lib/DumpFileUtils";
 import { Card, Tabs } from "antd";
+import { GraphsLoadedContext } from "../contexts/GraphsLoadedContext";
 
 const { TabPane } = Tabs;
 
@@ -30,7 +30,7 @@ export default function DumpFolderTabs(props: Props) {
   const [dumpDirectoryMap, setDumpDirectoryMap] = useState<DumpDirectoryMap>(
     Map({ [EMPTY_TAB_NAME]: [] })
   );
-  const { setSelectedDumpFile } = useContext(SelectedDumpFileContext);
+  const { setGraphsLoaded } = useContext(GraphsLoadedContext);
 
   useEffect(() => {
     window.ipc_events.subscribe(
@@ -47,6 +47,8 @@ export default function DumpFolderTabs(props: Props) {
             dumpDirectoryMap.set(payload.directoryName, files)
           );
         }
+
+        setGraphsLoaded(true);
       }
     );
 
@@ -87,11 +89,8 @@ export default function DumpFolderTabs(props: Props) {
     <Card>
       <Tabs onSelect={handleTabChange}>
         {tabs.map((tab) => (
-          <TabPane tab={tab.content}>
-            <BgvFileList
-              listOfBgvFiles={finalListOfBgvFiles()}
-              setSelectedFile={setSelectedDumpFile}
-            />
+          <TabPane key={tab.id} tab={tab.content}>
+            <BgvFileList listOfBgvFiles={finalListOfBgvFiles()} />
           </TabPane>
         ))}
       </Tabs>
