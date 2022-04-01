@@ -25,7 +25,7 @@ function buildTabs(loadedDumps: DumpDirectoryMap) {
 }
 
 export default function DumpFolderTabs(props: Props) {
-  const methodFilter: string = props.methodFilter;
+  const { methodFilter } = props;
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
   const [dumpDirectoryMap, setDumpDirectoryMap] = useState<DumpDirectoryMap>(
     Map({ [EMPTY_TAB_NAME]: [] })
@@ -64,33 +64,17 @@ export default function DumpFolderTabs(props: Props) {
 
   const tabs = buildTabs(dumpDirectoryMap);
   const tabId = tabs[selectedTabIndex]?.id;
-  const unfilteredList = dumpDirectoryMap.get(tabId) || [];
-
-  function finalListOfBgvFiles(): DumpFile[] {
-    const filteredList = unfilteredList.filter((query) =>
-      query.name.includes(methodFilter)
-    );
-    const filteredListWithNoResults =
-      filteredList.length == 0
-        ? [
-            {
-              name: "No results found.",
-              directory: "",
-              filename: "",
-              id: "",
-            },
-          ]
-        : filteredList;
-
-    return methodFilter == "" ? unfilteredList : filteredListWithNoResults;
-  }
+  const listOfBgvFiles = dumpDirectoryMap.get(tabId) || [];
 
   return (
     <Card>
       <Tabs onSelect={handleTabChange}>
         {tabs.map((tab) => (
           <TabPane key={tab.id} tab={tab.content}>
-            <BgvFileList listOfBgvFiles={finalListOfBgvFiles()} />
+            <BgvFileList
+              listOfBgvFiles={listOfBgvFiles}
+              searchQuery={methodFilter}
+            />
           </TabPane>
         ))}
       </Tabs>

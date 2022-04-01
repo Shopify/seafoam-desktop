@@ -6,7 +6,7 @@ import { PartitionOutlined } from "@ant-design/icons";
 import { TreeProps } from "rc-tree";
 import { DataNode, EventDataNode } from "rc-tree/lib/interface";
 import { GraphDataSourceContext } from "../contexts/GraphDataSourceContext";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 
 type OnSelectCallback = TreeProps<CompilerPhaseTreeDataNode>["onSelect"];
 
@@ -18,45 +18,65 @@ interface CompilerPhaseTreeDataNode extends DataNode {
 
 interface Props {
   listOfBgvFiles: DumpFile[];
+  searchQuery: string;
 }
 
+const EMPTY_DUMP_FILE: DumpFile = {
+  id: "",
+  name: "",
+  directory: "",
+  filename: "",
+};
+
+const EMPTY_TREE_ENTRY = {
+  key: "<empty_tree_entry>",
+  title: "No results found.",
+  dumpFile: EMPTY_DUMP_FILE,
+  selectable: false,
+  isLeaf: true,
+};
+
+const updateTreeData = (
+  list: CompilerPhaseTreeDataNode[],
+  key: React.Key,
+  children: CompilerPhaseTreeDataNode[]
+): CompilerPhaseTreeDataNode[] => {
+  return list.map((node) => {
+    if (node.key === key) {
+      return {
+        ...node,
+        children,
+      };
+    }
+
+    if (node.children) {
+      return {
+        ...node,
+        children: updateTreeData(node.children, key, children),
+      };
+    }
+
+    return node;
+  });
+};
+
 export default function BgvFileList(props: Props) {
-  const { listOfBgvFiles } = props;
+  const { listOfBgvFiles, searchQuery } = props;
   const { setGraphDataSource } = useContext(GraphDataSourceContext);
+  const [treeData, setTreeData] = useState<CompilerPhaseTreeDataNode[]>([]);
 
-  const initialTreeData = listOfBgvFiles.map((bgvFile) => ({
-    title: bgvFile.name,
-    key: bgvFile.id,
-    selectable: false,
-    dumpFile: bgvFile,
-  }));
+  useEffect(() => {
+    const initialTreeData = listOfBgvFiles.map((bgvFile) => ({
+      title: bgvFile.name,
+      key: bgvFile.id,
+      selectable: false,
+      dumpFile: bgvFile,
+      isLeaf: bgvFile.id === "",
+      blockNode: true,
+    }));
 
-  const [treeData, setTreeData] =
-    React.useState<CompilerPhaseTreeDataNode[]>(initialTreeData);
-
-  const updateTreeData = (
-    list: CompilerPhaseTreeDataNode[],
-    key: React.Key,
-    children: CompilerPhaseTreeDataNode[]
-  ): CompilerPhaseTreeDataNode[] => {
-    return list.map((node) => {
-      if (node.key === key) {
-        return {
-          ...node,
-          children,
-        };
-      }
-
-      if (node.children) {
-        return {
-          ...node,
-          children: updateTreeData(node.children, key, children),
-        };
-      }
-
-      return node;
-    });
-  };
+    setTreeData(initialTreeData);
+  }, [listOfBgvFiles]);
 
   const onLoadData = (node: EventDataNode): Promise<void> =>
     new Promise<void>((resolve) => {
@@ -108,9 +128,19 @@ export default function BgvFileList(props: Props) {
     }
   };
 
+  const filteredTreeRoots = treeData.filter(
+    (value) => !searchQuery || value.title?.toString().includes(searchQuery)
+  );
+
   return (
     <Tree<CompilerPhaseTreeDataNode>
-      treeData={treeData}
+      treeData={
+        filteredTreeRoots.length === 0
+          ? treeData.length > 0
+            ? [EMPTY_TREE_ENTRY]
+            : []
+          : filteredTreeRoots
+      }
       loadData={onLoadData}
       onSelect={onSelect}
       showIcon={true}
