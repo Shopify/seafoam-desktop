@@ -42,7 +42,11 @@ export function GraphPanel() {
             ) : !dotData ? (
               <GraphLoading dumpFile={graphDataSource.dumpFile} />
             ) : (
-              <Graphviz dot={dotData} options={graphOptions} />
+              <Graphviz
+                className="graph-render"
+                dot={dotData}
+                options={graphOptions}
+              />
             )}
           </div>
         </Card>

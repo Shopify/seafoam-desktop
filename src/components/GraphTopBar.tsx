@@ -25,6 +25,6 @@ const row: React.CSSProperties = {
 };
 
 const search = {
-  flex: 2,
-  padding: 16,
+  flexGrow: 2,
+  padding: "16px",
 };

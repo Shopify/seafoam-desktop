@@ -32,8 +32,7 @@ const App = () => {
 
 const styles = {
   app: {
-    flex: 1,
-    width: "100vw",
+    flexGrow: 1,
     height: "100vh",
     flexDirection: "row",
   },
@@ -51,7 +50,7 @@ const styles = {
     width: "30vw",
   },
   right: {
-    flex: 2,
+    flexGrow: 2,
     height: "100vh",
   },
 };
