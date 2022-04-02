@@ -2,8 +2,9 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import LeftPanel from "./components/LeftPanel";
 import RightPanel from "./components/RightPanel";
-import { SelectedDumpFileProvider } from "./contexts/SelectedDumpFileContext";
 import { ErrorBoundary } from "./components/ErrorBoundary";
+import { GraphsLoadedProvider } from "./contexts/GraphsLoadedContext";
+import { GraphDataSourceProvider } from "./contexts/GraphDataSourceContext";
 
 const App = () => {
   // The App is tentatively split into two "sections". This is achieved by using two full-height divs, and using CSS flex
@@ -12,16 +13,18 @@ const App = () => {
   return (
     <div style={styles.app as React.CSSProperties}>
       <ErrorBoundary>
-        <SelectedDumpFileProvider>
-          <div style={styles.box as React.CSSProperties}>
-            <div style={styles.left as React.CSSProperties}>
-              <LeftPanel />
+        <GraphsLoadedProvider>
+          <GraphDataSourceProvider>
+            <div style={styles.box as React.CSSProperties}>
+              <div style={styles.left as React.CSSProperties}>
+                <LeftPanel />
+              </div>
+              <div style={styles.right as React.CSSProperties}>
+                <RightPanel />
+              </div>
             </div>
-            <div style={styles.right as React.CSSProperties}>
-              <RightPanel />
-            </div>
-          </div>
-        </SelectedDumpFileProvider>
+          </GraphDataSourceProvider>
+        </GraphsLoadedProvider>
       </ErrorBoundary>
     </div>
   );
@@ -29,8 +32,7 @@ const App = () => {
 
 const styles = {
   app: {
-    flex: 1,
-    width: "100vw",
+    flexGrow: 1,
     height: "100vh",
     flexDirection: "row",
   },
@@ -48,7 +50,7 @@ const styles = {
     width: "30vw",
   },
   right: {
-    flex: 2,
+    flexGrow: 2,
     height: "100vh",
   },
 };

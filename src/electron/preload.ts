@@ -7,7 +7,12 @@
 // renderer process.
 
 import { contextBridge, ipcRenderer } from "electron";
-import { IPCEvents, IPCPayload } from "../events";
+import {
+  IPCEvents,
+  IPCPayload,
+  LoadedPhaseDataPayload,
+  LoadPhaseDataPayload,
+} from "../events";
 import ElectronLog from "electron-log";
 
 // Enable IPC logging (must be configured here to work in the renderer process).
@@ -44,12 +49,17 @@ export interface IPC<Event extends IPCEvents> {
   ) => void;
   unsubscribe: (event: Event) => void;
   send: (event: Event, payload: IPCPayload[Event]) => void;
+  fetchPhases: (
+    payload: LoadPhaseDataPayload
+  ) => Promise<LoadedPhaseDataPayload>;
 }
 
 contextBridge.exposeInMainWorld("ipc_events", {
   subscribe: subscribe,
   unsubscribe: unsubscribe,
   send: send,
+  fetchPhases: (payload: LoadPhaseDataPayload) =>
+    ipcRenderer.invoke(IPCEvents.LoadPhaseData, payload),
 });
 
 contextBridge.exposeInMainWorld("logger", ElectronLog);

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Graphviz } from "graphviz-react";
 import GraphTopBar from "./GraphTopBar";
 import { GraphLoading } from "./GraphLoading";
@@ -6,21 +6,19 @@ import { GraphvizOptions } from "d3-graphviz";
 import { fetchDotData, IPCEvents, LoadedDotDataPayload } from "../events";
 import { ChoosePhaseCTA } from "./ChoosePhaseCTA";
 import { Card } from "antd";
+import { GraphDataSourceContext } from "../contexts/GraphDataSourceContext";
 
-interface Props {
-  dumpFile: DumpFile;
-  compilerPhases: CompilerPhase[];
-}
-
-export function GraphPanel(props: Props) {
-  const { dumpFile, compilerPhases } = props;
+export function GraphPanel() {
   const [dotData, setDotData] = useState<Nullable<Dot>>(null);
-  const [phase, setPhase] = useState<Nullable<CompilerPhase>>(null);
+  const { graphDataSource } = useContext(GraphDataSourceContext);
 
   useEffect(() => {
     setDotData(null);
-    setPhase(null);
-  }, [compilerPhases, dumpFile]);
+
+    if (graphDataSource) {
+      fetchDotData(graphDataSource.dumpFile, graphDataSource.compilerPhase);
+    }
+  }, [graphDataSource]);
 
   useEffect(() => {
     window.ipc_events.subscribe(
@@ -35,24 +33,20 @@ export function GraphPanel(props: Props) {
 
   return (
     <div style={column}>
-      <GraphTopBar
-        phases={compilerPhases}
-        onPhaseChange={(phase) => {
-          setDotData(null);
-          setPhase(phase);
-
-          fetchDotData(dumpFile, phase);
-        }}
-      />
+      <GraphTopBar compilerPhase={graphDataSource?.compilerPhase} />
       <div style={cardContainer}>
         <Card>
           <div style={box}>
-            {!phase ? (
+            {!graphDataSource ? (
               <ChoosePhaseCTA />
             ) : !dotData ? (
-              <GraphLoading dumpFile={dumpFile} />
+              <GraphLoading dumpFile={graphDataSource.dumpFile} />
             ) : (
-              <Graphviz dot={dotData} options={graphOptions} />
+              <Graphviz
+                className="graph-render"
+                dot={dotData}
+                options={graphOptions}
+              />
             )}
           </div>
         </Card>

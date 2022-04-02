@@ -45,8 +45,8 @@ if (require("electron-squirrel-startup")) {
 const createWindow = (): void => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    height: 600,
-    width: 800,
+    height: 768,
+    width: 1024,
     webPreferences: {
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
     },
@@ -56,7 +56,7 @@ const createWindow = (): void => {
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
 
   // Open the DevTools.
-  mainWindow.webContents.openDevTools();
+  //mainWindow.webContents.openDevTools();
 };
 
 // This method will be called when Electron has finished
@@ -114,6 +114,19 @@ ipcMain.on(
     }
   }
 );
+
+ipcMain.handle(IPCEvents.LoadPhaseData, async (event, payload) => {
+  const { filename } = payload;
+
+  try {
+    const data = await fetchCompilerPhases(filename);
+
+    return { phases: data };
+  } catch (e) {
+    handleSeafoamCommandError(e, "Error fetching compiler phases");
+    return [];
+  }
+});
 
 ipcMain.on(IPCEvents.OpenDirectoryChooser, async (event) => {
   const browserWindow = BrowserWindow.fromId(event.sender.id);

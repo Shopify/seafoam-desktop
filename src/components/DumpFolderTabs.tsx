@@ -2,10 +2,10 @@ import * as React from "react";
 import { useCallback, useContext, useEffect, useState } from "react";
 import BgvFileList from "./BgvFileList";
 import { DirectoryLoadedPayload, IPCEvents } from "../events";
-import { SelectedDumpFileContext } from "../contexts/SelectedDumpFileContext";
 import { Map } from "immutable";
 import { createDumpFile } from "../lib/DumpFileUtils";
 import { Card, Tabs } from "antd";
+import { GraphsLoadedContext } from "../contexts/GraphsLoadedContext";
 
 const { TabPane } = Tabs;
 
@@ -25,12 +25,12 @@ function buildTabs(loadedDumps: DumpDirectoryMap) {
 }
 
 export default function DumpFolderTabs(props: Props) {
-  const methodFilter: string = props.methodFilter;
+  const { methodFilter } = props;
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
   const [dumpDirectoryMap, setDumpDirectoryMap] = useState<DumpDirectoryMap>(
     Map({ [EMPTY_TAB_NAME]: [] })
   );
-  const { setSelectedDumpFile } = useContext(SelectedDumpFileContext);
+  const { setGraphsLoaded } = useContext(GraphsLoadedContext);
 
   useEffect(() => {
     window.ipc_events.subscribe(
@@ -47,6 +47,8 @@ export default function DumpFolderTabs(props: Props) {
             dumpDirectoryMap.set(payload.directoryName, files)
           );
         }
+
+        setGraphsLoaded(true);
       }
     );
 
@@ -62,35 +64,16 @@ export default function DumpFolderTabs(props: Props) {
 
   const tabs = buildTabs(dumpDirectoryMap);
   const tabId = tabs[selectedTabIndex]?.id;
-  const unfilteredList = dumpDirectoryMap.get(tabId) || [];
-
-  function finalListOfBgvFiles(): DumpFile[] {
-    const filteredList = unfilteredList.filter((query) =>
-      query.name.includes(methodFilter)
-    );
-    const filteredListWithNoResults =
-      filteredList.length == 0
-        ? [
-            {
-              name: "No results found.",
-              directory: "",
-              filename: "",
-              id: "",
-            },
-          ]
-        : filteredList;
-
-    return methodFilter == "" ? unfilteredList : filteredListWithNoResults;
-  }
+  const listOfBgvFiles = dumpDirectoryMap.get(tabId) || [];
 
   return (
     <Card>
       <Tabs onSelect={handleTabChange}>
         {tabs.map((tab) => (
-          <TabPane tab={tab.content}>
+          <TabPane key={tab.id} tab={tab.content}>
             <BgvFileList
-              listOfBgvFiles={finalListOfBgvFiles()}
-              setSelectedFile={setSelectedDumpFile}
+              listOfBgvFiles={listOfBgvFiles}
+              searchQuery={methodFilter}
             />
           </TabPane>
         ))}

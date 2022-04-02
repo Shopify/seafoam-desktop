@@ -1,39 +1,23 @@
 import React from "react";
-import { Input, Select } from "antd";
+import { Input, Typography } from "antd";
 
 const { Search } = Input;
+const { Title } = Typography;
 
-export interface Props {
-  phases: CompilerPhase[];
-  onPhaseChange: (phase: CompilerPhase) => void;
+interface Props {
+  compilerPhase?: CompilerPhase;
 }
 
 export default function GraphTopBar(props: Props) {
-  const { onPhaseChange, phases } = props;
-
-  const handleSelectPhaseChange = React.useCallback(
-    (value) => {
-      const phaseNumber = parseInt(value);
-
-      onPhaseChange(phases[phaseNumber]);
-    },
-    [phases]
-  );
+  const { compilerPhase } = props;
 
   return (
     <div style={row}>
-      <div style={picker}>
-        <Select
-          placeholder="<Select Compiler Phase>"
-          onChange={handleSelectPhaseChange}
-          options={phases.map((phase, index) => {
-            return {
-              label: phase.name,
-              value: index.toString(),
-            };
-          })}
-        />
-      </div>
+      {compilerPhase && (
+        <Title
+          level={5}
+        >{`${compilerPhase.method}: ${compilerPhase.name} (${compilerPhase.number})`}</Title>
+      )}
       <div style={search}>
         <Search onSearch={() => alert("Not yet implemented")} />
       </div>
@@ -42,22 +26,10 @@ export default function GraphTopBar(props: Props) {
 }
 
 const row: React.CSSProperties = {
-  flexGrow: 0,
-  flexShrink: 1,
-  flexBasis: "auto",
-  display: "flex",
-  flexDirection: "row",
   width: "60vw",
-  alignItems: "flex-end",
-  justifyContent: "space-around",
-};
-
-const picker = {
-  flex: 1,
-  padding: 16,
 };
 
 const search = {
-  flex: 2,
-  padding: 16,
+  marginBottom: "16px",
+  marginTop: "16px",
 };
