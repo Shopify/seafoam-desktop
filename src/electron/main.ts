@@ -15,8 +15,6 @@ declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 
-export const IS_MAC = process.platform === "darwin";
-
 // Configure logging.
 ElectronLog.transports.console.level = "debug";
 ElectronLog.transports.file.level = "error";

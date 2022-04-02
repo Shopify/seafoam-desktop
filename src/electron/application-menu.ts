@@ -8,7 +8,7 @@ import {
 import * as fs from "fs";
 import { IPCEvents } from "../events";
 import ElectronLog from "electron-log";
-import { IS_MAC } from "./main";
+import { IS_MAC } from "./utils";
 
 const GRAAL_DUMP_EXTENSION = ".bgv";
 

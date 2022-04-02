@@ -4,7 +4,7 @@ import { promisify } from "util";
 import { file } from "tmp-promise";
 import ElectronLog from "electron-log";
 import { dialog } from "electron";
-import { IS_MAC } from "./main";
+import { IS_MAC } from "./utils";
 
 function isSeafoamCommandException(
   error: unknown
