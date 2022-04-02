@@ -31,7 +31,7 @@ ElectronLog.catchErrors({
   },
 });
 
-app.setName("Seafoam");
+app.setName("Seafoam Desktop");
 app.commandLine.appendSwitch("js-flags", "--max-old-space-size=8192");
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
