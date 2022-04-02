@@ -14,14 +14,7 @@ const GRAAL_DUMP_EXTENSION = ".bgv";
 
 const macMenu: MenuItemConstructorOptions = {
   label: app.name,
-  submenu: [
-    {
-      role: "about",
-    },
-    {
-      role: "quit",
-    },
-  ],
+  role: "appMenu",
 };
 
 export function openDirectoryChooser(
