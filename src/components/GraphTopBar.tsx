@@ -1,11 +1,23 @@
 import React from "react";
-import { Input } from "antd";
+import { Input, Typography } from "antd";
 
 const { Search } = Input;
+const { Title } = Typography;
 
-export default function GraphTopBar() {
+interface Props {
+  compilerPhase?: CompilerPhase;
+}
+
+export default function GraphTopBar(props: Props) {
+  const { compilerPhase } = props;
+
   return (
     <div style={row}>
+      {compilerPhase && (
+        <Title
+          level={5}
+        >{`${compilerPhase.method}: ${compilerPhase.name} (${compilerPhase.number})`}</Title>
+      )}
       <div style={search}>
         <Search onSearch={() => alert("Not yet implemented")} />
       </div>
@@ -14,17 +26,10 @@ export default function GraphTopBar() {
 }
 
 const row: React.CSSProperties = {
-  flexGrow: 0,
-  flexShrink: 1,
-  flexBasis: "auto",
-  display: "flex",
-  flexDirection: "row",
   width: "60vw",
-  alignItems: "flex-end",
-  justifyContent: "space-around",
 };
 
 const search = {
-  flexGrow: 2,
-  padding: "16px",
+  marginBottom: "16px",
+  marginTop: "16px",
 };

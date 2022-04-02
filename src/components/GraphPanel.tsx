@@ -33,7 +33,7 @@ export function GraphPanel() {
 
   return (
     <div style={column}>
-      <GraphTopBar />
+      <GraphTopBar compilerPhase={graphDataSource?.compilerPhase} />
       <div style={cardContainer}>
         <Card>
           <div style={box}>
